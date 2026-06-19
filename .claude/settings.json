@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "npm run dev",
+      "npm run build",
+      "git status",
+      "git diff",
+      "git log -n 5"
+    ]
+  },
+  "mcp": {
+    "servers": {
+      "postgres": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-postgres",
+          "--connection-string",
+          "postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+        ]
+      }
+    }
+  }
+}
