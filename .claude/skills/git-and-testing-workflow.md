@@ -14,6 +14,6 @@
 
 ## Commit Message Formatting
 Every commit message must strictly adhere to the following structure:
-1. A single-sentence summary of the change at the top.
+1. A single-sentence summary of the change at the top. 
 2. A few paragraphs explaining the technical changes and the verification/testing steps taken.
 3. A final line prefixed with "Prompt: " containing the exact prompt the user used to trigger the task.
