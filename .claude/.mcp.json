@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "supabase-mcp@latest"
+      ],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_API_KEY": "${SUPABASE_API_KEY}"
+      },
+      "disabled": false
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "@anthropic-ai/postgres-mcp@latest"
+      ],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}"
+      },
+      "disabled": false
+    }
+  }
+}

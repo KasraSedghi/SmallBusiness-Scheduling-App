@@ -10,15 +10,27 @@
   },
   "mcp": {
     "servers": {
+      "supabase": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@anthropic-ai/supabase-mcp"
+        ],
+        "env": {
+          "SUPABASE_URL": "https://your-project-id.supabase.co",
+          "SUPABASE_API_KEY": "your-supabase-service-role-key-here"
+        }
+      },
       "postgres": {
         "command": "npx",
         "args": [
           "-y",
           "@modelcontextprotocol/server-postgres",
           "--connection-string",
-          "postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+          "postgresql://postgres:YOUR_PASSWORD@db.your-project-id.supabase.co:5432/postgres"
         ]
       }
     }
-  }
+  },
+  "enableAllProjectMcpServers": true
 }
