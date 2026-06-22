@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validatePassword, validateSchedule } from '../validation';
+import { validatePassword, validateSchedule, validateShiftDuration, validateShiftCapacity } from '../validation';
 
 describe('validatePassword', () => {
   describe('valid passwords', () => {
@@ -191,6 +191,35 @@ describe('validateSchedule', () => {
     });
   });
 
+  describe('weekly maximum cap', () => {
+    it('rejects schedule exceeding 40 hours per week', () => {
+      const shifts = [{ hours: 25 }, { hours: 20 }];
+      const result = validateSchedule(shifts, 45);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Cannot work more than 40 hours per week');
+    });
+
+    it('accepts schedule with exactly 40 hours', () => {
+      const shifts = [{ hours: 20 }, { hours: 20 }];
+      const result = validateSchedule(shifts, 40);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('accepts schedule with 39 hours', () => {
+      const shifts = [{ hours: 20 }, { hours: 19 }];
+      const result = validateSchedule(shifts, 39);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('returns both insufficient hours AND excess hours errors', () => {
+      // Edge case: 0 hours (below min) would be caught by min check, not max check
+      const shifts = [{ hours: 25 }, { hours: 25 }];
+      const result = validateSchedule(shifts, 50);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Cannot work more than 40 hours per week');
+    });
+  });
+
   describe('edge cases', () => {
     it('handles null hours in shift objects', () => {
       const shifts = [{ hours: 4 }, { hours: 4 }];
@@ -198,10 +227,11 @@ describe('validateSchedule', () => {
       expect(result.isValid).toBe(true);
     });
 
-    it('handles very high hour counts', () => {
+    it('handles very high hour counts (rejects > 40)', () => {
       const shifts = [{ hours: 100 }, { hours: 100 }];
       const result = validateSchedule(shifts, 200);
-      expect(result.isValid).toBe(true);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Cannot work more than 40 hours per week');
     });
 
     it('rejects negative hours count', () => {
@@ -210,9 +240,203 @@ describe('validateSchedule', () => {
       expect(result.isValid).toBe(false);
     });
 
-    it('handles fractional hours', () => {
+    it('handles fractional hours within range', () => {
       const shifts = [{ hours: 4.5 }, { hours: 4.5 }];
       const result = validateSchedule(shifts, 9);
+      expect(result.isValid).toBe(true);
+    });
+  });
+});
+
+describe('validateShiftDuration', () => {
+  describe('valid shift hours', () => {
+    it('accepts 3-hour shift (minimum)', () => {
+      const result = validateShiftDuration(3);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('accepts 4-hour shift', () => {
+      const result = validateShiftDuration(4);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('accepts 8-hour shift', () => {
+      const result = validateShiftDuration(8);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('accepts fractional hours (3.5)', () => {
+      const result = validateShiftDuration(3.5);
+      expect(result.isValid).toBe(true);
+    });
+  });
+
+  describe('below minimum duration', () => {
+    it('rejects 2.9-hour shift', () => {
+      const result = validateShiftDuration(2.9);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Each shift must be at least 3 hours');
+    });
+
+    it('rejects 1-hour shift', () => {
+      const result = validateShiftDuration(1);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Each shift must be at least 3 hours');
+    });
+
+    it('rejects 0-hour shift', () => {
+      const result = validateShiftDuration(0);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Each shift must be at least 3 hours');
+    });
+
+    it('rejects negative hours', () => {
+      const result = validateShiftDuration(-5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Each shift must be at least 3 hours');
+    });
+  });
+
+  describe('exceeds single-shift maximum', () => {
+    it('rejects 40.1-hour shift', () => {
+      const result = validateShiftDuration(40.1);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('A single shift cannot exceed 40 hours');
+    });
+
+    it('accepts exactly 40-hour shift', () => {
+      const result = validateShiftDuration(40);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('rejects 50-hour shift', () => {
+      const result = validateShiftDuration(50);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('A single shift cannot exceed 40 hours');
+    });
+
+    it('rejects 100-hour shift', () => {
+      const result = validateShiftDuration(100);
+      expect(result.isValid).toBe(false);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('handles exactly 3 hours', () => {
+      const result = validateShiftDuration(3);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('handles very small fractional hours below minimum', () => {
+      const result = validateShiftDuration(0.5);
+      expect(result.isValid).toBe(false);
+    });
+
+    it('handles maximum boundary exactly', () => {
+      const result = validateShiftDuration(40);
+      expect(result.isValid).toBe(true);
+    });
+  });
+});
+
+describe('validateShiftCapacity', () => {
+  describe('standard week (non-holiday)', () => {
+    it('accepts hours below standard capacity', () => {
+      const config = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(35, config);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('accepts hours at standard capacity limit', () => {
+      const config = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(40, config);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('rejects hours exceeding standard capacity', () => {
+      const config = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(45, config);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Cannot exceed 40 hours on standard weeks');
+    });
+  });
+
+  describe('holiday week flag', () => {
+    it('accepts hours below holiday capacity', () => {
+      const config = { isHoliday: true, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(30, config);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('accepts hours at holiday capacity limit', () => {
+      const config = { isHoliday: true, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(32, config);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('rejects hours exceeding holiday capacity', () => {
+      const config = { isHoliday: true, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(35, config);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Cannot exceed 32 hours on holiday weeks');
+    });
+
+    it('flags holiday week in error message', () => {
+      const config = { isHoliday: true, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(40, config);
+      expect(result.isValid).toBe(false);
+      expect(result.errors[0]).toContain('holiday');
+    });
+  });
+
+  describe('dynamic capacity switching', () => {
+    it('allows 40 hours on standard week but rejects on holiday', () => {
+      const standardConfig = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const holidayConfig = { isHoliday: true, standardCapacity: 40, holidayCapacity: 32 };
+
+      const standard = validateShiftCapacity(40, standardConfig);
+      const holiday = validateShiftCapacity(40, holidayConfig);
+
+      expect(standard.isValid).toBe(true);
+      expect(holiday.isValid).toBe(false);
+    });
+
+    it('respects capacity change from standard to holiday', () => {
+      const hours = 35;
+      const standardConfig = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const holidayConfig = { isHoliday: true, standardCapacity: 40, holidayCapacity: 32 };
+
+      const standard = validateShiftCapacity(hours, standardConfig);
+      const holiday = validateShiftCapacity(hours, holidayConfig);
+
+      expect(standard.isValid).toBe(true);
+      expect(holiday.isValid).toBe(false);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('handles zero hours', () => {
+      const config = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(0, config);
+      expect(result.isValid).toBe(true);
+    });
+
+    it('handles exactly boundary values', () => {
+      const config = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const standard = validateShiftCapacity(40, config);
+      expect(standard.isValid).toBe(true);
+    });
+
+    it('handles very high hour counts', () => {
+      const config = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(100, config);
+      expect(result.isValid).toBe(false);
+    });
+
+    it('handles fractional hours', () => {
+      const config = { isHoliday: false, standardCapacity: 40, holidayCapacity: 32 };
+      const result = validateShiftCapacity(39.5, config);
       expect(result.isValid).toBe(true);
     });
   });

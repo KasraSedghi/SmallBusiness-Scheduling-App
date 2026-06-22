@@ -7,6 +7,8 @@ export interface ScheduleValidation {
 
 const MINIMUM_SHIFTS = 2;
 const MINIMUM_HOURS = 8;
+const MINIMUM_SHIFT_DURATION = 3;
+const MAXIMUM_WEEKLY_HOURS = 40;
 
 export function validateSchedule(
   shifts: Array<{ hours: number }>,
@@ -23,6 +25,60 @@ export function validateSchedule(
   if (totalHours < MINIMUM_HOURS) {
     errors.push(
       `Must work at least ${MINIMUM_HOURS} hours per week`
+    );
+  }
+
+  if (totalHours > MAXIMUM_WEEKLY_HOURS) {
+    errors.push(
+      `Cannot work more than ${MAXIMUM_WEEKLY_HOURS} hours per week`
+    );
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateShiftDuration(hours: number): ScheduleValidation {
+  const errors: string[] = [];
+
+  if (hours < MINIMUM_SHIFT_DURATION) {
+    errors.push(
+      `Each shift must be at least ${MINIMUM_SHIFT_DURATION} hours`
+    );
+  }
+
+  if (hours > MAXIMUM_WEEKLY_HOURS) {
+    errors.push(
+      `A single shift cannot exceed ${MAXIMUM_WEEKLY_HOURS} hours`
+    );
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export interface ShiftCapacityConfig {
+  isHoliday: boolean;
+  standardCapacity: number;
+  holidayCapacity: number;
+}
+
+export function validateShiftCapacity(
+  totalHours: number,
+  config: ShiftCapacityConfig
+): ScheduleValidation {
+  const errors: string[] = [];
+  const maxCapacity = config.isHoliday
+    ? config.holidayCapacity
+    : config.standardCapacity;
+
+  if (totalHours > maxCapacity) {
+    errors.push(
+      `Cannot exceed ${maxCapacity} hours on ${config.isHoliday ? 'holiday' : 'standard'} weeks`
     );
   }
 
