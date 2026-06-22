@@ -26,7 +26,11 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return parseCookieHeader(request.headers.get('cookie') || '');
+          const cookies = parseCookieHeader(request.headers.get('cookie') || '');
+          return cookies.map((cookie) => ({
+            name: cookie.name,
+            value: cookie.value || '',
+          }));
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
@@ -55,13 +59,17 @@ export async function middleware(request: NextRequest) {
   // Check role-based access for protected routes
   for (const [route, allowedRoles] of Object.entries(PROTECTED_ROUTES)) {
     if (pathname.startsWith(route)) {
+      if (!user.email) {
+        return NextResponse.redirect(new URL('/login', request.url));
+      }
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('email', user.email)
         .single();
 
-      if (!profile || !allowedRoles.includes(profile.role)) {
+      if (!profile || !allowedRoles.includes((profile as any).role)) {
         return NextResponse.redirect(new URL('/login', request.url));
       }
     }

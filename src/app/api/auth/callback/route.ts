@@ -50,22 +50,24 @@ export async function GET(request: NextRequest) {
     .eq('email', userEmail)
     .single();
 
-  let profileId = user.id;
-  let userRole = 'employee';
+  let userRole: 'employee' | 'admin' = 'employee';
 
   // If profile exists with same email, use it (account linking scenario)
   if (existingProfile) {
-    profileId = existingProfile.id;
-    userRole = existingProfile.role;
+    userRole = (existingProfile as { id: string; role: string }).role as 'employee' | 'admin';
   } else if (!lookupError || lookupError.code === 'PGRST116') {
     // PGRST116 = no rows found, which is expected for new signups
     // Create new profile for first-time user
-    const { error: insertError } = await supabase.from('profiles').insert({
+    const profileData: any = {
       id: user.id,
       email: userEmail,
-      role: 'employee', // Default role for new users
+      role: 'employee',
       avatar_url: null,
-    });
+    };
+
+    const { error: insertError } = await supabase
+      .from('profiles')
+      .insert(profileData);
 
     if (insertError) {
       return NextResponse.redirect(

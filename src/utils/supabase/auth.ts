@@ -36,12 +36,13 @@ export async function signUpWithEmail(
 
   // Create profile for new user
   try {
-    await supabase.from('profiles').insert({
+    const profileData: any = {
       id: data.user.id,
       email,
       role: 'employee',
       avatar_url: null,
-    });
+    };
+    await supabase.from('profiles').insert(profileData);
   } catch (profileError) {
     console.error('Failed to create profile:', profileError);
     return { data: null, error: 'Failed to create user profile' };
