@@ -193,7 +193,7 @@ export default function RosterGrid({
               <div className="w-20 font-semibold text-red-bean">{DAY_LABELS[day]}</div>
               <div className="flex gap-4 flex-1">
                 {SHIFT_TYPES.map((shift) => {
-                  const required = capacityRules[day]?.[shift as any] || 0;
+                  const required = (capacityRules[day] as any)?.[shift] || 0;
                   const actual = staffingByShift[day]?.[shift] || 0;
                   const shortfall = required - actual;
 

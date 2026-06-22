@@ -131,7 +131,7 @@ export default function AdminCapacityPage() {
       const rules: CapacityRules = {
         capacity: capacities,
         is_holiday: isHoliday,
-        holiday_overrides: isHoliday ? capacities : {},
+        holiday_overrides: {},
       };
 
       if (isHoliday && backupCapacities) {
