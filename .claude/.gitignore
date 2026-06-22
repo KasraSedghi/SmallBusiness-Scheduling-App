@@ -1,0 +1,23 @@
+# Dependency directories (never upload these, they are huge)
+node_modules/
+.pnpm-store/
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Local Environment Variables (CRITICAL: Keeps your keys private)
+.env
+.env.local
+.env.production
+.env.development
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db

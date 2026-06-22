@@ -9,7 +9,7 @@ The Agent is expected to write robust, isolated test suites using **Vitest** for
 
 ### A. Pure Business Logic & Math Functions (Unit Tests)
 * **Target:** Core state calculations, scheduling constraints, rule processing engines.
-* **Requirements:** - Validate the 8-hour shift minimum and 40-hour maximum cap logic blocks.
+* **Requirements:** - Validate the 3-hour per shift minimum, 8 hours per week minimum, and 40-hour maximum cap logic blocks.
   - Test dynamic shift capacity flag logic under multiple conditions (e.g., standard days vs. Holiday toggle states).
   - Include assertions for edge cases: `null` arrays, zero values, extreme hour loads, and negative values.
 
