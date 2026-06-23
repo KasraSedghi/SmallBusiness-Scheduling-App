@@ -1,0 +1,50 @@
+-- Create avatars storage bucket (if not exists)
+-- Note: Supabase doesn't have RLS at the bucket level in SQL
+-- Storage buckets and their policies are managed via the Supabase dashboard or JS SDK
+-- This migration documents the bucket configuration
+
+-- Bucket: avatars
+-- Purpose: Store user profile pictures
+-- Access: Public read (for all users to see avatars), authenticated upload (for own avatars)
+-- Configuration:
+--   - File type: Images only (.webp, .jpg, .png, etc)
+--   - File naming: {userId}.webp (replaces old avatar on re-upload)
+--   - Max file size: 2MB (enforced client-side via compression)
+--   - Path pattern: avatars/{userId}.webp
+--
+-- RLS Policies to configure in Supabase Dashboard:
+--
+-- Policy 1: Allow authenticated users to upload their own avatar
+--   - Target: storage.objects
+--   - Definition: (bucket_id = 'avatars'::text) AND (auth.uid()::text = (storage.foldername(name))[1])
+--   - Allowed operations: INSERT
+--   - Note: Folder name should be "avatars" and object name should be "{userId}.webp"
+--
+-- Policy 2: Allow authenticated users to update their own avatar (for replacement)
+--   - Target: storage.objects
+--   - Definition: (bucket_id = 'avatars'::text) AND (auth.uid()::text = (storage.foldername(name))[1])
+--   - Allowed operations: UPDATE
+--
+-- Policy 3: Allow all users to read avatars (public access)
+--   - Target: storage.objects
+--   - Definition: (bucket_id = 'avatars'::text)
+--   - Allowed operations: SELECT
+--
+-- Policy 4: Allow admins to delete avatars
+--   - Target: storage.objects
+--   - Definition: (bucket_id = 'avatars'::text) AND (auth.jwt() ->> 'role' = 'admin')
+--   - Allowed operations: DELETE
+--
+-- Implementation notes:
+-- - The bucket must be created via Supabase dashboard or JS SDK (not SQL)
+-- - Use createClient from '@/utils/supabase/client' or '@/utils/supabase/server'
+-- - Storage.from('avatars').upload() with { upsert: true } replaces old avatar
+-- - Storage.from('avatars').getPublicUrl() returns https://[project-id].supabase.co/storage/v1/object/public/avatars/{userId}.webp
+-- - Bucket must be public to allow getPublicUrl() to work
+--
+-- Client-side compression (in AvatarUploader.tsx):
+-- - Max dimensions: 400x400 pixels
+-- - Format: WebP
+-- - Quality: 0.8
+-- - Max size: 2MB after compression
+-- - Validation: Image files only, max 50MB original

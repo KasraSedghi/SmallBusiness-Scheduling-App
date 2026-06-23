@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShiftSelector } from '@/components/modules/ShiftSelector';
+import AvatarUploader from '@/components/modules/AvatarUploader';
 import { getCurrentUser } from '@/utils/supabase/auth';
 import { createClient } from '@/utils/supabase/client';
 import {
@@ -23,6 +24,7 @@ export default function AvailabilityPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
   const [hoursUntilDeadline, setHoursUntilDeadline] = useState(0);
 
@@ -47,6 +49,7 @@ export default function AvailabilityPage() {
         }
 
         setUserEmail(userResult.data.email || null);
+        setUserId(userResult.data.id);
 
         // Check deadline
         const deadlinePassed = isSubmissionDeadlinePassedForWeek(weekStarting);
@@ -176,19 +179,31 @@ export default function AvailabilityPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-red-bean mb-2">
-            Your Weekly Shifts
-          </h1>
-          <p className="text-coffee-brown">
-            Week of {new Date(weekStarting).toLocaleDateString('en-US', {
-              weekday: 'long',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </p>
-          {userEmail && (
-            <p className="text-sm text-coffee-brown opacity-70 mt-1">{userEmail}</p>
-          )}
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-red-bean mb-2">
+                Your Weekly Shifts
+              </h1>
+              <p className="text-coffee-brown">
+                Week of {new Date(weekStarting).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </p>
+              {userEmail && (
+                <p className="text-sm text-coffee-brown opacity-70 mt-1">{userEmail}</p>
+              )}
+            </div>
+            {userId && userEmail && (
+              <div className="bg-white rounded-lg p-4 border border-light-cream">
+                <AvatarUploader
+                  profileId={userId}
+                  email={userEmail}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Deadline Notice */}

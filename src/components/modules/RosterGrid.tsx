@@ -3,6 +3,7 @@
 import React from 'react';
 import { Availability, TimeOffRequest, ShiftCapacity } from '@/types/index';
 import { calculateScheduleMetrics, getConstraintStatus } from '@/utils/helpers/validation';
+import AvatarDisplay from '@/components/ui/AvatarDisplay';
 
 const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const SHIFT_TYPES = ['morning', 'afternoon', 'evening'];
@@ -96,13 +97,20 @@ export default function RosterGrid({
       >
         {/* Employee Header */}
         <div className="flex items-start justify-between mb-4 pb-4 border-b border-light-cream">
-          <div className="flex-1">
-            <h3 className="font-semibold text-red-bean">
-              {avail.profile?.email || 'Unknown Employee'}
-            </h3>
-            <p className="text-xs text-coffee-brown opacity-70">
-              ID: {avail.profile_id.substring(0, 8)}...
-            </p>
+          <div className="flex items-start gap-3 flex-1">
+            <AvatarDisplay
+              email={avail.profile?.email || 'Unknown Employee'}
+              avatarUrl={avail.profile?.avatar_url}
+              size="md"
+            />
+            <div>
+              <h3 className="font-semibold text-red-bean">
+                {avail.profile?.email || 'Unknown Employee'}
+              </h3>
+              <p className="text-xs text-coffee-brown opacity-70">
+                ID: {avail.profile_id.substring(0, 8)}...
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {constraintBadge}
