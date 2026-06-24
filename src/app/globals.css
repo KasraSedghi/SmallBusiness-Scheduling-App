@@ -12,6 +12,7 @@
   --color-coffee-brown: #6F4E37;
   --color-light-cream: #F5E6D3;
   --color-white-cream: #FFF8F0;
+  --font-serif: var(--font-playfair), Georgia, serif;
 }
 
 * {
