@@ -41,6 +41,14 @@ export default function AvailabilityPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        // Check for authorization error from middleware
+        const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+        if (params.get('error') === 'unauthorized') {
+          setError('Access denied. You do not have permission to access the admin dashboard.');
+          setLoading(false);
+          return;
+        }
+
         // Get current user
         const userResult = await getCurrentUser();
         if (userResult.error || !userResult.data) {

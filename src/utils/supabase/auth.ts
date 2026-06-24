@@ -127,3 +127,24 @@ export async function getCurrentUser() {
 
   return { data: user, error: null };
 }
+
+export async function getUserProfile() {
+  const supabase = createClient();
+
+  const userResult = await getCurrentUser();
+  if (userResult.error || !userResult.data) {
+    return { data: null, error: 'Not authenticated' };
+  }
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('id, email, role')
+    .eq('id', userResult.data.id)
+    .single();
+
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  return { data: profile as { id: string; email: string; role: 'employee' | 'admin' }, error: null };
+}
