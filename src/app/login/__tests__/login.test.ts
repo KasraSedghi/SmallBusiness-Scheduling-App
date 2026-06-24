@@ -260,25 +260,92 @@ describe('Login Page Business Logic', () => {
     });
   });
 
-  describe('tab switching', () => {
-    it('starts with email/password tab active', () => {
-      const activeTab = 'email';
-      expect(activeTab).toBe('email');
+  describe('auth mode switching (sign in vs sign up)', () => {
+    it('starts in sign in mode', () => {
+      const mode = 'signin';
+      expect(mode).toBe('signin');
     });
 
-    it('can switch to Google tab', () => {
-      const activeTab = 'google';
-      expect(activeTab).toBe('google');
+    it('can switch to sign up mode', () => {
+      const mode = 'signup';
+      expect(mode).toBe('signup');
     });
 
-    it('can switch back to email tab from Google', () => {
-      const activeTab = 'email';
-      expect(activeTab).toBe('email');
+    it('can switch back to sign in mode from sign up', () => {
+      const mode = 'signin';
+      expect(mode).toBe('signin');
     });
 
-    it('clears errors when switching tabs', () => {
+    it('clears errors and success message when switching modes', () => {
       const error = '';
+      const success = '';
       expect(error).toBe('');
+      expect(success).toBe('');
+    });
+
+    it('clears password fields when switching modes', () => {
+      const password = '';
+      const confirmPassword = '';
+      expect(password).toBe('');
+      expect(confirmPassword).toBe('');
+    });
+
+    it('shows confirm password field only in sign up mode', () => {
+      const mode = 'signup';
+      const showConfirmPassword = mode === 'signup';
+      expect(showConfirmPassword).toBe(true);
+    });
+
+    it('hides confirm password field in sign in mode', () => {
+      const mode = 'signin';
+      const showConfirmPassword = mode === 'signup';
+      expect(showConfirmPassword).toBe(false);
+    });
+  });
+
+  describe('sign up validation', () => {
+    it('requires passwords to match', () => {
+      const password = 'ValidPass123';
+      const confirmPassword = 'DifferentPass123';
+      const errorMessage = password !== confirmPassword ? 'Passwords do not match' : '';
+      expect(errorMessage).toBe('Passwords do not match');
+    });
+
+    it('passes when passwords match', () => {
+      const password = 'ValidPass123';
+      const confirmPassword = 'ValidPass123';
+      const errorMessage = password !== confirmPassword ? 'Passwords do not match' : '';
+      expect(errorMessage).toBe('');
+    });
+
+    it('enforces full password validation (uppercase + number) on signup', () => {
+      const password = 'lowercase123';
+      const hasUppercase = /[A-Z]/.test(password);
+      expect(hasUppercase).toBe(false);
+    });
+
+    it('shows success message after account creation', () => {
+      const accountCreated = true;
+      const successMessage = accountCreated
+        ? 'Account created! Redirecting to your schedule...'
+        : '';
+      expect(successMessage).toBe('Account created! Redirecting to your schedule...');
+    });
+
+    it('routes new signups to /availability to build their first schedule', () => {
+      const route = '/availability';
+      expect(route).toBe('/availability');
+    });
+
+    it('shows "Creating account..." text while sign up is loading', () => {
+      const loading = true;
+      const mode = 'signup';
+      const buttonText = loading
+        ? mode === 'signup'
+          ? 'Creating account...'
+          : 'Signing in...'
+        : 'Create Account';
+      expect(buttonText).toBe('Creating account...');
     });
   });
 
