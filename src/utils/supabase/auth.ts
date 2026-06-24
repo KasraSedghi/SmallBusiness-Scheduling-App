@@ -34,12 +34,12 @@ export async function signUpWithEmail(
     return { data: null, error: 'Signup failed: no user returned' };
   }
 
-  // Create profile for new user
+  // Create profile for new user (always employee role)
   try {
     const profileData: any = {
       id: data.user.id,
       email,
-      role: 'employee',
+      role: 'employee', // Always employee - admin accounts created separately
       avatar_url: null,
     };
     await supabase.from('profiles').insert(profileData);

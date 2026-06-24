@@ -1,0 +1,31 @@
+-- Admin Account Setup (One-Time Initialization)
+-- This migration documents the admin account creation process
+--
+-- Purpose: Set up the initial admin account with specific credentials
+-- Email: admin@redbean.com
+-- Username field stored in profiles table as a reference
+-- Password: Hashed and managed by Supabase Auth
+--
+-- Implementation:
+-- 1. Create Supabase Auth user via admin API or signup endpoint
+-- 2. Insert profile with role='admin' in profiles table
+-- 3. Email: admin@redbean.com (for notifications, password resets)
+-- 4. Username reference: "Sedghi" (stored in a comment or separate field if needed)
+--
+-- Security Notes:
+-- - Admin account created only once during initial setup
+-- - signUpWithEmail validates that new profiles get role='employee'
+-- - signUpWithEmail is the only public registration method
+-- - No way for regular users to escalate to admin role
+-- - Admin emails should not be publicly accessible
+--
+-- To create the admin account manually:
+-- 1. Go to Supabase Dashboard → Authentication → Users
+-- 2. Click "Add user"
+-- 3. Email: admin@redbean.com
+-- 4. Password: SedghiAdmin1967@
+-- 5. Then insert into profiles table:
+--    INSERT INTO profiles (id, email, role)
+--    VALUES ('<user_id_from_supabase>', 'admin@redbean.com', 'admin');
+--
+-- Or use the initializeAdminAccount() function in src/utils/supabase/admin-setup.ts
