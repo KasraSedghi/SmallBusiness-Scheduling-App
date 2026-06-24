@@ -9,14 +9,14 @@ export interface ShiftSelectorProps {
   isLocked?: boolean;
 }
 
-const DAYS_OF_WEEK: Array<{ key: DayOfWeek; label: string }> = [
-  { key: 'sunday', label: 'Sunday' },
-  { key: 'monday', label: 'Monday' },
-  { key: 'tuesday', label: 'Tuesday' },
-  { key: 'wednesday', label: 'Wednesday' },
-  { key: 'thursday', label: 'Thursday' },
-  { key: 'friday', label: 'Friday' },
-  { key: 'saturday', label: 'Saturday' },
+const DAYS_OF_WEEK: Array<{ key: DayOfWeek; label: string; short: string }> = [
+  { key: 'sunday', label: 'Sunday', short: 'Sun' },
+  { key: 'monday', label: 'Monday', short: 'Mon' },
+  { key: 'tuesday', label: 'Tuesday', short: 'Tue' },
+  { key: 'wednesday', label: 'Wednesday', short: 'Wed' },
+  { key: 'thursday', label: 'Thursday', short: 'Thu' },
+  { key: 'friday', label: 'Friday', short: 'Fri' },
+  { key: 'saturday', label: 'Saturday', short: 'Sat' },
 ];
 
 const SHIFT_HOURS: Record<string, Record<string, number>> = {
@@ -39,69 +39,71 @@ export function ShiftSelector({
   const isFriSat = (day: DayOfWeek) => day === 'friday' || day === 'saturday';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {DAYS_OF_WEEK.map((day) => {
         const dayShifts = shiftData[day.key];
         const isWeekend = isFriSat(day.key);
 
         return (
-          <div
-            key={day.key}
-            className="bg-white rounded-lg border border-light-cream overflow-hidden shadow-sm"
-          >
-            <div className="bg-gradient-to-r from-red-bean to-dark-crimson px-4 py-3">
-              <h3 className="text-lg font-semibold text-white-cream">{day.label}</h3>
-            </div>
+          <section key={day.key}>
+            <h3 className="mb-2 px-1 text-sm font-semibold text-stone-700">
+              {day.label}
+            </h3>
 
-            <div className="p-4 space-y-3">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               {(['morning', 'afternoon', 'evening'] as const).map((shiftType) => {
-                const shiftTime =
-                  SHIFT_TIMES[shiftType][isWeekend ? 'friSat' : 'sunThu'];
-                const hours =
-                  SHIFT_HOURS[shiftType][
-                    isWeekend ? 'fri-sat' : 'sun-thu'
-                  ];
+                const shiftTime = SHIFT_TIMES[shiftType][isWeekend ? 'friSat' : 'sunThu'];
+                const hours = SHIFT_HOURS[shiftType][isWeekend ? 'fri-sat' : 'sun-thu'];
                 const isSelected = dayShifts[shiftType];
 
                 return (
-                  <label
+                  <button
                     key={shiftType}
-                    className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-light-cream transition-colors"
+                    type="button"
+                    role="checkbox"
+                    aria-checked={isSelected}
+                    aria-label={`${day.label} ${shiftType} shift`}
+                    disabled={isLocked}
+                    onClick={() => !isLocked && onShiftChange(day.key, shiftType, !isSelected)}
+                    className={`min-h-11 select-none rounded-xl p-4 text-left transition-all duration-200 ${
+                      isLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer active:scale-95 active:duration-150'
+                    } ${
+                      isSelected
+                        ? 'border-2 border-red-900 bg-red-950/5 font-medium text-red-950 shadow-sm'
+                        : 'border border-stone-200 bg-white/90 text-stone-700 hover:border-stone-300'
+                    }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={(e) =>
-                        !isLocked && onShiftChange(day.key, shiftType, e.target.checked)
-                      }
-                      disabled={isLocked}
-                      className="w-6 h-6 rounded cursor-pointer accent-red-bean"
-                      aria-label={`${day.label} ${shiftType} shift`}
-                    />
-                    <div className="flex-1">
-                      <div className="text-sm font-medium text-coffee-brown">
-                        {shiftType.charAt(0).toUpperCase() + shiftType.slice(1)}
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="text-sm font-medium">
+                          {shiftType.charAt(0).toUpperCase() + shiftType.slice(1)}
+                        </div>
+                        <div className={`mt-0.5 text-xs ${isSelected ? 'text-red-900/70' : 'text-stone-400'}`}>
+                          {shiftTime}
+                        </div>
+                        <div className={`text-xs ${isSelected ? 'text-red-900/70' : 'text-stone-400'}`}>
+                          {hours}h
+                        </div>
                       </div>
-                      <div className="text-xs text-coffee-brown opacity-70">
-                        {shiftTime} ({hours}h)
-                      </div>
-                    </div>
-                    {isSelected && !isLocked && (
-                      <div className="w-5 h-5 rounded-full bg-red-bean flex items-center justify-center">
+                      {isSelected && (
                         <svg
-                          className="w-3 h-3 text-white-cream"
+                          className="mt-0.5 h-4 w-4 shrink-0 text-red-900"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
-                      </div>
-                    )}
-                  </label>
+                      )}
+                    </div>
+                  </button>
                 );
               })}
             </div>
-          </div>
+          </section>
         );
       })}
     </div>

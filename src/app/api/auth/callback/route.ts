@@ -1,9 +1,13 @@
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
+
+const SIGNUP_ACCESS_CODE = 'RedBean2007';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
+  const accessCode = searchParams.get('access_code');
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 
@@ -56,7 +60,24 @@ export async function GET(request: NextRequest) {
   if (existingProfile) {
     userRole = (existingProfile as { id: string; role: string }).role as 'employee' | 'admin';
   } else if (!lookupError || lookupError.code === 'PGRST116') {
-    // PGRST116 = no rows found, which is expected for new signups
+    // PGRST116 = no rows found, which is expected for new signups.
+    // Require a valid staff access code before provisioning a brand new account.
+    if (accessCode !== SIGNUP_ACCESS_CODE) {
+      await supabase.auth.signOut();
+      try {
+        const adminClient = createAdminClient();
+        await adminClient.auth.admin.deleteUser(user.id);
+      } catch (cleanupError) {
+        console.error('Failed to clean up unauthorized Google signup:', cleanupError);
+      }
+      return NextResponse.redirect(
+        new URL(
+          `/login?error=${encodeURIComponent('Invalid access code. Ask your manager for the staff signup code.')}`,
+          request.url
+        )
+      );
+    }
+
     // Create new profile for first-time user
     const profileData: any = {
       id: user.id,

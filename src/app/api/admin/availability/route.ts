@@ -39,10 +39,21 @@ export async function GET(request: Request) {
       throw new Error(availError?.message || timeOffError?.message);
     }
 
+    const profileIds = [...new Set((availabilities || []).map((a: any) => a.profile_id))];
+    const { data: profiles } = profileIds.length
+      ? await supabase.from('profiles').select('id, email, avatar_url').in('id', profileIds)
+      : { data: [] };
+
+    const profileById = new Map((profiles || []).map((p: any) => [p.id, p]));
+    const enrichedAvailabilities = (availabilities || []).map((a: any) => ({
+      ...a,
+      profile: profileById.get(a.profile_id) || null,
+    }));
+
     return Response.json(
       {
         data: {
-          availabilities: availabilities || [],
+          availabilities: enrichedAvailabilities,
           time_off_requests: timeOffRequests || [],
           week_starting: weekStarting,
         },
@@ -52,5 +63,48 @@ export async function GET(request: Request) {
   } catch (err) {
     console.error('Failed to fetch availabilities:', err);
     return Response.json({ error: 'Failed to fetch availabilities' }, { status: 500 });
+  }
+}
+
+/**
+ * PUT /api/admin/availability
+ * Update an availability's approval status.
+ * Body: { id: string, status: 'pending' | 'approved' }
+ */
+export async function PUT(request: Request) {
+  try {
+    const user = await getCurrentUser();
+    if (!user.data || user.data.role !== 'admin') {
+      return Response.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body.id !== 'string') {
+      return Response.json({ error: 'Missing required field: id' }, { status: 400 });
+    }
+
+    if (body.status !== 'pending' && body.status !== 'approved') {
+      return Response.json(
+        { error: 'Invalid status: must be "pending" or "approved"' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = await createClient();
+
+    const { data, error } = await (supabase.from('availabilities') as any)
+      .update({ status: body.status, updated_at: new Date().toISOString() })
+      .eq('id', body.id)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return Response.json({ data }, { status: 200 });
+  } catch (err) {
+    console.error('Failed to update availability:', err);
+    return Response.json({ error: 'Failed to update availability' }, { status: 500 });
   }
 }

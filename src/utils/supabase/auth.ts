@@ -79,13 +79,19 @@ export async function signInWithEmail(
   };
 }
 
-export async function signInWithGoogle(): Promise<AuthResponse<{ url: string }>> {
+export async function signInWithGoogle(
+  accessCode?: string
+): Promise<AuthResponse<{ url: string }>> {
   const supabase = createClient();
+
+  const redirectTo = accessCode
+    ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?access_code=${encodeURIComponent(accessCode)}`
+    : `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback`,
+      redirectTo,
       scopes: 'email profile',
     },
   });

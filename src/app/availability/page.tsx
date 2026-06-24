@@ -25,6 +25,7 @@ export default function AvailabilityPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
   const [hoursUntilDeadline, setHoursUntilDeadline] = useState(0);
 
@@ -58,6 +59,17 @@ export default function AvailabilityPage() {
 
         setUserEmail(userResult.data.email || null);
         setUserId(userResult.data.id);
+
+        // Load avatar for the sticky header
+        const supabaseProfile = createClient();
+        const { data: profile } = await supabaseProfile
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', userResult.data.id)
+          .single();
+        if (profile) {
+          setAvatarUrl((profile as any).avatar_url || null);
+        }
 
         // Check deadline
         const deadlinePassed = isSubmissionDeadlinePassedForWeek(weekStarting);
@@ -171,105 +183,120 @@ export default function AvailabilityPage() {
     }
   };
 
+  const initials = userEmail
+    ? userEmail
+        .split('@')[0]
+        .split(/[._-]/)
+        .slice(0, 2)
+        .map((p) => p.charAt(0).toUpperCase())
+        .join('')
+    : '';
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center bg-stone-50 p-4">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-light-cream border-t-red-bean rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-coffee-brown">Loading your availability...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-stone-200 border-t-red-900"></div>
+          <p className="text-stone-600">Loading your availability...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-red-bean mb-2">
-                Your Weekly Shifts
-              </h1>
-              <p className="text-coffee-brown">
-                Week of {new Date(weekStarting).toLocaleDateString('en-US', {
-                  weekday: 'long',
+    <div className="min-h-screen bg-stone-50">
+      {/* Sticky header: employee profile section */}
+      <header className="sticky top-0 z-10 border-b border-stone-200 bg-stone-50/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-3 min-w-0">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={userEmail || 'Profile'}
+                className="h-10 w-10 shrink-0 rounded-full border border-orange-200/60 object-cover shadow-inner"
+              />
+            ) : (
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-orange-200/60 bg-orange-100 text-sm font-semibold text-red-950 shadow-inner">
+                {initials}
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-stone-800">
+                {userEmail || 'Employee'}
+              </p>
+              <p className="truncate text-xs text-stone-500">
+                Week of{' '}
+                {new Date(weekStarting).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                 })}
               </p>
-              {userEmail && (
-                <p className="text-sm text-coffee-brown opacity-70 mt-1">{userEmail}</p>
-              )}
             </div>
-            {userId && userEmail && (
-              <div className="bg-white rounded-lg p-4 border border-light-cream">
-                <AvatarUploader
-                  profileId={userId}
-                  email={userEmail}
-                />
-              </div>
-            )}
           </div>
+          <button
+            onClick={() => router.push('/')}
+            className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700"
+          >
+            Back
+          </button>
         </div>
+      </header>
+
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+        <h1 className="mb-4 text-2xl font-semibold text-stone-800">Your Weekly Shifts</h1>
 
         {/* Deadline Notice */}
         {isDeadlinePassed ? (
-          <div className="mb-6 p-4 bg-red-100 border-l-4 border-red-bean rounded-r-lg">
-            <div className="flex items-start gap-3">
-              <div className="text-red-bean text-lg mt-0.5">⚠️</div>
-              <div>
-                <h3 className="font-semibold text-red-bean mb-1">
-                  Submission Deadline Passed
-                </h3>
-                <p className="text-sm text-coffee-brown">
-                  The deadline for submitting your availability was Sunday at 10:00 AM.
-                  Your shifts are now locked. Contact an admin if you need to make changes.
-                </p>
-              </div>
+          <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-900/15 bg-red-950/5 p-4">
+            <span className="mt-0.5 text-lg">⚠️</span>
+            <div>
+              <h3 className="mb-1 text-sm font-semibold text-red-950">
+                Submission Deadline Passed
+              </h3>
+              <p className="text-sm font-light text-red-900/80">
+                The deadline for submitting your availability was Sunday at 10:00 AM.
+                Your shifts are now locked. Contact an admin if you need to make changes.
+              </p>
             </div>
           </div>
         ) : (
-          <div className="mb-6 p-4 bg-light-cream border-l-4 border-red-bean rounded-r-lg">
-            <div className="flex items-start gap-3">
-              <div className="text-red-bean text-lg mt-0.5">⏱️</div>
-              <div>
-                <h3 className="font-semibold text-coffee-brown mb-1">
-                  Submit by Sunday 10:00 AM
-                </h3>
-                <p className="text-sm text-coffee-brown">
-                  {hoursUntilDeadline > 0
-                    ? `${hoursUntilDeadline} hours remaining to submit your availability`
-                    : 'Deadline approaching!'}
-                </p>
-              </div>
+          <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-200/70 bg-amber-50 p-4">
+            <span className="mt-0.5 text-lg">⏱️</span>
+            <div>
+              <h3 className="mb-1 text-sm font-semibold text-amber-900">
+                Submit by Sunday 10:00 AM
+              </h3>
+              <p className="text-sm font-light text-amber-900">
+                {hoursUntilDeadline > 0
+                  ? `${hoursUntilDeadline} hours remaining to submit your availability`
+                  : 'Deadline approaching!'}
+              </p>
             </div>
           </div>
         )}
 
         {/* Requirements & Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-white rounded-lg p-4 text-center border border-light-cream">
-            <div className="text-2xl font-bold text-red-bean">{totalShifts}</div>
-            <div className="text-xs text-coffee-brown mt-1">Shifts Selected</div>
-            <div className="text-xs text-coffee-brown opacity-70 mt-1">Min: 2</div>
+        <div className="mb-5 grid grid-cols-3 gap-3">
+          <div className="rounded-xl border border-stone-200 bg-white/90 p-4 text-center">
+            <div className="text-2xl font-semibold text-stone-800">{totalShifts}</div>
+            <div className="mt-1 text-xs text-stone-500">Shifts Selected</div>
+            <div className="mt-0.5 text-xs text-stone-400">Min: 2</div>
           </div>
-          <div className="bg-white rounded-lg p-4 text-center border border-light-cream">
-            <div className="text-2xl font-bold text-red-bean">{totalHours.toFixed(1)}</div>
-            <div className="text-xs text-coffee-brown mt-1">Hours</div>
-            <div className="text-xs text-coffee-brown opacity-70 mt-1">Min: 8</div>
+          <div className="rounded-xl border border-stone-200 bg-white/90 p-4 text-center">
+            <div className="text-2xl font-semibold text-stone-800">{totalHours.toFixed(1)}</div>
+            <div className="mt-1 text-xs text-stone-500">Hours</div>
+            <div className="mt-0.5 text-xs text-stone-400">Min: 8</div>
           </div>
-          <div className="bg-white rounded-lg p-4 text-center border border-light-cream">
+          <div className="rounded-xl border border-stone-200 bg-white/90 p-4 text-center">
             <div
-              className={`text-2xl font-bold ${
-                validation.isValid ? 'text-red-bean' : 'text-red-600'
+              className={`text-2xl font-semibold ${
+                validation.isValid ? 'text-red-900' : 'text-red-600'
               }`}
             >
               {validation.isValid ? '✓' : '✕'}
             </div>
-            <div className="text-xs text-coffee-brown mt-1">Status</div>
-            <div className="text-xs text-coffee-brown opacity-70 mt-1">
+            <div className="mt-1 text-xs text-stone-500">Status</div>
+            <div className="mt-0.5 text-xs text-stone-400">
               {validation.isValid ? 'Valid' : 'Invalid'}
             </div>
           </div>
@@ -277,20 +304,20 @@ export default function AvailabilityPage() {
 
         {/* Error Banner */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-bean rounded-r-lg">
-            <p className="text-sm font-semibold text-red-bean">{error}</p>
+          <div className="mb-5 rounded-xl border border-red-900/15 bg-red-50 p-4">
+            <p className="text-sm font-medium text-red-900">{error}</p>
           </div>
         )}
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-600 rounded-r-lg">
-            <p className="text-sm font-semibold text-green-700">{successMessage}</p>
+          <div className="mb-5 rounded-xl border border-green-700/15 bg-green-50 p-4">
+            <p className="text-sm font-medium text-green-700">{successMessage}</p>
           </div>
         )}
 
         {/* Shift Selector */}
-        <div className="mb-8">
+        <div className="mb-6">
           <ShiftSelector
             shiftData={shiftData}
             onShiftChange={handleShiftChange}
@@ -303,26 +330,33 @@ export default function AvailabilityPage() {
           <button
             onClick={handleSave}
             disabled={isDeadlinePassed || saving || !validation.isValid}
-            className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+            className={`flex-1 transform rounded-xl py-3 font-medium transition-all duration-300 ${
               isDeadlinePassed || saving || !validation.isValid
-                ? 'bg-light-cream text-coffee-brown opacity-50 cursor-not-allowed'
-                : 'bg-red-bean text-white-cream hover:bg-dark-crimson active:scale-95'
+                ? 'cursor-not-allowed bg-stone-200 text-stone-400'
+                : 'bg-linear-to-r from-red-950 to-red-900 text-stone-100 shadow-md shadow-red-950/10 hover:-translate-y-0.5 hover:from-red-900 hover:to-rose-900 active:scale-[0.98]'
             }`}
           >
             {saving ? 'Saving...' : 'Save Availability'}
           </button>
-          <button
-            onClick={() => router.push('/')}
-            className="px-4 py-3 rounded-lg font-semibold border border-coffee-brown text-coffee-brown hover:bg-light-cream transition-all"
-          >
-            Back
-          </button>
         </div>
 
+        {/* Avatar settings */}
+        {userId && userEmail && (
+          <div className="mt-6 rounded-xl border border-stone-200 bg-white/90 p-4">
+            <h3 className="mb-3 text-sm font-semibold text-stone-700">Profile Picture</h3>
+            <AvatarUploader
+              profileId={userId}
+              email={userEmail}
+              currentAvatarUrl={avatarUrl}
+              onUploadSuccess={(url) => setAvatarUrl(url)}
+            />
+          </div>
+        )}
+
         {/* Minimum Requirements Info */}
-        <div className="mt-8 p-4 bg-light-cream rounded-lg text-sm text-coffee-brown">
-          <h3 className="font-semibold mb-2">Minimum Requirements</h3>
-          <ul className="space-y-1 opacity-70">
+        <div className="mt-6 rounded-xl bg-stone-100 p-4 text-sm text-stone-600">
+          <h3 className="mb-2 font-semibold text-stone-700">Minimum Requirements</h3>
+          <ul className="space-y-1 text-stone-500">
             <li>• At least 2 shifts per week</li>
             <li>• At least 8 hours total per week</li>
             <li>• Maximum 40 hours per week</li>

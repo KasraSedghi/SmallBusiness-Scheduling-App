@@ -36,8 +36,13 @@ export function calculateTotalShifts(shiftData: ShiftData): number {
   return count;
 }
 
+function parseDateLocal(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
 export function isSubmissionDeadlinePassedForWeek(weekStartingDate: string): boolean {
-  const deadline = new Date(weekStartingDate);
+  const deadline = parseDateLocal(weekStartingDate);
   deadline.setHours(10, 0, 0, 0);
   return new Date() > deadline;
 }
@@ -49,11 +54,20 @@ export function getWeekStartingDate(): string {
 
   const weekStart = new Date(today);
   weekStart.setDate(diff);
-  return weekStart.toISOString().split('T')[0];
+  const currentWeekStarting = weekStart.toISOString().split('T')[0];
+
+  // Once the Sunday 10AM deadline for the current week has passed, employees
+  // are submitting for the upcoming week instead of being locked out forever.
+  if (isSubmissionDeadlinePassedForWeek(currentWeekStarting)) {
+    weekStart.setDate(weekStart.getDate() + 7);
+    return weekStart.toISOString().split('T')[0];
+  }
+
+  return currentWeekStarting;
 }
 
 export function getHoursUntilDeadline(weekStartingDate: string): number {
-  const deadline = new Date(weekStartingDate);
+  const deadline = parseDateLocal(weekStartingDate);
   deadline.setHours(10, 0, 0, 0);
 
   const now = new Date();

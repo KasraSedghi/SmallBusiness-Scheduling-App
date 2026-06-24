@@ -154,17 +154,8 @@ describe('Shift Helpers', () => {
       vi.useRealTimers();
     });
 
-    it('returns correct week start for a Monday', () => {
-      const mockDate = new Date('2026-06-22T12:00:00Z'); // Monday
-      vi.useFakeTimers();
-      vi.setSystemTime(mockDate);
-
-      const result = getWeekStartingDate();
-      expect(result).toBe('2026-06-21'); // Sunday
-    });
-
-    it('returns correct week start for a Sunday', () => {
-      const mockDate = new Date('2026-06-21T12:00:00Z'); // Sunday
+    it('returns correct week start for a Sunday before the deadline', () => {
+      const mockDate = new Date('2026-06-21T12:00:00Z'); // Sunday, 5AM PDT (before 10AM local deadline)
       vi.useFakeTimers();
       vi.setSystemTime(mockDate);
 
@@ -172,31 +163,40 @@ describe('Shift Helpers', () => {
       expect(result).toBe('2026-06-21');
     });
 
-    it('returns correct week start for a Wednesday', () => {
+    it('rolls forward to next week once the Sunday deadline has passed (Monday)', () => {
+      const mockDate = new Date('2026-06-22T12:00:00Z'); // Monday
+      vi.useFakeTimers();
+      vi.setSystemTime(mockDate);
+
+      const result = getWeekStartingDate();
+      expect(result).toBe('2026-06-28'); // following Sunday
+    });
+
+    it('rolls forward to next week once the Sunday deadline has passed (Wednesday)', () => {
       const mockDate = new Date('2026-06-24T12:00:00Z'); // Wednesday
       vi.useFakeTimers();
       vi.setSystemTime(mockDate);
 
       const result = getWeekStartingDate();
-      expect(result).toBe('2026-06-21'); // Sunday
+      expect(result).toBe('2026-06-28'); // following Sunday
     });
 
-    it('returns correct week start for a Friday', () => {
+    it('rolls forward to next week once the Sunday deadline has passed (Friday)', () => {
       const mockDate = new Date('2026-06-26T12:00:00Z'); // Friday
       vi.useFakeTimers();
       vi.setSystemTime(mockDate);
 
       const result = getWeekStartingDate();
-      expect(result).toBe('2026-06-21'); // Sunday
+      expect(result).toBe('2026-06-28'); // following Sunday
     });
 
-    it('returns correct week start for a Saturday', () => {
+    it('rolls forward to next week once the Sunday deadline has passed (Saturday)', () => {
       const mockDate = new Date('2026-06-27T12:00:00Z'); // Saturday
       vi.useFakeTimers();
       vi.setSystemTime(mockDate);
 
       const result = getWeekStartingDate();
-      expect(result).toBe('2026-06-21'); // Sunday
+      expect(result).toBe('2026-06-28'); // following Sunday
     });
   });
 

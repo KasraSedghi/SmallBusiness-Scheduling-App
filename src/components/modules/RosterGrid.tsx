@@ -74,13 +74,14 @@ export default function RosterGrid({
     let constraintBadge = null;
     if (!meetsMinimum) {
       constraintBadge = (
-        <span className="inline-block bg-red-100 text-red-700 text-xs px-2 py-1 rounded">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-900">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400 duration-2000" />
           Under-scheduled ({metrics.shiftCount} shifts, {metrics.totalHours}h)
         </span>
       );
     } else if (!withinMaximum) {
       constraintBadge = (
-        <span className="inline-block bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-900">
           Over-scheduled ({metrics.totalHours}h)
         </span>
       );
@@ -89,25 +90,21 @@ export default function RosterGrid({
     return (
       <div
         key={avail.id}
-        className={`border border-light-cream rounded-lg p-4 mb-4 transition-colors ${
-          avail.status === 'approved'
-            ? 'bg-green-50 border-green-200'
-            : 'bg-white hover:bg-gray-50'
-        }`}
+        className="overflow-hidden rounded-xl border border-stone-200/60 bg-white transition-colors duration-150 hover:bg-orange-50/40"
       >
         {/* Employee Header */}
-        <div className="flex items-start justify-between mb-4 pb-4 border-b border-light-cream">
-          <div className="flex items-start gap-3 flex-1">
+        <div className="flex items-start justify-between gap-3 border-b border-stone-200/60 p-4">
+          <div className="flex flex-1 items-start gap-3">
             <AvatarDisplay
               email={avail.profile?.email || 'Unknown Employee'}
               avatarUrl={avail.profile?.avatar_url}
               size="md"
             />
             <div>
-              <h3 className="font-semibold text-red-bean">
+              <h3 className="font-semibold text-stone-800">
                 {avail.profile?.email || 'Unknown Employee'}
               </h3>
-              <p className="text-xs text-coffee-brown opacity-70">
+              <p className="text-xs text-stone-400">
                 ID: {avail.profile_id.substring(0, 8)}...
               </p>
             </div>
@@ -115,10 +112,10 @@ export default function RosterGrid({
           <div className="flex items-center gap-2">
             {constraintBadge}
             <span
-              className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+              className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
                 avail.status === 'approved'
-                  ? 'bg-green-200 text-green-800'
-                  : 'bg-yellow-200 text-yellow-800'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-amber-100 text-amber-900'
               }`}
             >
               {avail.status === 'approved' ? '✓ Approved' : 'Pending'}
@@ -127,34 +124,37 @@ export default function RosterGrid({
         </div>
 
         {/* Shift Grid */}
-        <div className="overflow-x-auto mb-4">
-          <div className="inline-grid gap-1 mb-4">
+        <div className="overflow-x-auto p-4">
+          <div className="inline-grid gap-px overflow-hidden rounded-lg border border-stone-200/60 bg-stone-200/60">
             {/* Day headers */}
-            <div className="flex gap-1">
+            <div className="flex gap-px">
               {DAYS_OF_WEEK.map((day) => (
-                <div key={`header-${day}`} className="w-16 text-center">
-                  <p className="text-xs font-semibold text-coffee-brown">{DAY_LABELS[day]}</p>
+                <div
+                  key={`header-${day}`}
+                  className="w-16 bg-stone-100/80 p-2 text-center text-xs font-semibold uppercase tracking-wider text-stone-700"
+                >
+                  {DAY_LABELS[day]}
                 </div>
               ))}
             </div>
 
             {/* Shift rows */}
             {SHIFT_TYPES.map((shift) => (
-              <div key={`row-${shift}`} className="flex gap-1">
+              <div key={`row-${shift}`} className="flex gap-px">
                 {DAYS_OF_WEEK.map((day) => (
                   <div
                     key={`cell-${day}-${shift}`}
-                    className="w-16 h-12 flex items-center justify-center text-xs border border-light-cream rounded"
+                    className="flex h-12 w-16 items-center justify-center bg-white text-xs"
                     title={`${DAY_LABELS[day]} ${SHIFT_LABELS[shift]}`}
                   >
                     <div
-                      className={`w-full h-full flex items-center justify-center rounded transition-all ${
+                      className={`flex h-full w-full items-center justify-center font-semibold transition-all ${
                         (avail.shift_data as any)[day]?.[shift]
-                          ? 'bg-red-bean text-white font-bold'
-                          : 'bg-white text-gray-300'
+                          ? 'bg-red-950/5 text-red-900'
+                          : 'text-stone-300'
                       }`}
                     >
-                      {(avail.shift_data as any)[day]?.[shift] ? '✓' : '-'}
+                      {(avail.shift_data as any)[day]?.[shift] ? '✓' : '–'}
                     </div>
                   </div>
                 ))}
@@ -164,15 +164,15 @@ export default function RosterGrid({
         </div>
 
         {/* Metrics & Action */}
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-coffee-brown">
-            <span className="font-semibold">{metrics.shiftCount} shifts</span>,{' '}
-            <span className="font-semibold">{metrics.totalHours}h total</span>
+        <div className="flex items-center justify-between border-t border-stone-200/60 p-4">
+          <div className="text-sm text-stone-500">
+            <span className="font-semibold text-stone-700">{metrics.shiftCount} shifts</span>,{' '}
+            <span className="font-semibold text-stone-700">{metrics.totalHours}h total</span>
           </div>
           {avail.status === 'pending' && onApprovalChange && (
             <button
               onClick={() => onApprovalChange(avail.id, 'approved')}
-              className="px-4 py-2 bg-red-bean text-white-cream rounded-lg text-sm font-semibold hover:bg-dark-crimson transition-all"
+              className="rounded-lg bg-linear-to-r from-red-950 to-red-900 px-4 py-2 text-sm font-medium text-stone-100 shadow-md shadow-red-950/10 transition-all duration-200 hover:from-red-900 active:scale-[0.98]"
             >
               Approve
             </button>
@@ -180,7 +180,7 @@ export default function RosterGrid({
           {avail.status === 'approved' && onApprovalChange && (
             <button
               onClick={() => onApprovalChange(avail.id, 'pending')}
-              className="px-4 py-2 bg-gray-400 text-white rounded-lg text-sm font-semibold hover:bg-gray-500 transition-all"
+              className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-600 transition-all duration-200 hover:bg-stone-50 active:scale-[0.98]"
             >
               Revert
             </button>
@@ -193,31 +193,40 @@ export default function RosterGrid({
   // Calculate shift staffing summary
   const renderStaffingSummary = () => {
     return (
-      <div className="bg-light-cream rounded-lg p-6 mb-8">
-        <h3 className="text-lg font-semibold text-coffee-brown mb-4">Shift Staffing Summary</h3>
-        <div className="space-y-3">
+      <div className="overflow-hidden rounded-xl border border-stone-200/60 bg-white">
+        <div className="border-b border-stone-200/60 bg-stone-100/80 p-4">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-700">
+            Shift Staffing Summary
+          </h3>
+        </div>
+        <div className="divide-y divide-stone-200/60">
           {DAYS_OF_WEEK.map((day) => (
-            <div key={`summary-${day}`} className="flex items-center gap-4">
-              <div className="w-20 font-semibold text-red-bean">{DAY_LABELS[day]}</div>
-              <div className="flex gap-4 flex-1">
+            <div
+              key={`summary-${day}`}
+              className="flex items-center gap-4 p-4 transition-colors duration-150 hover:bg-orange-50/40"
+            >
+              <div className="w-20 text-sm font-semibold text-stone-700">{DAY_LABELS[day]}</div>
+              <div className="flex flex-1 gap-3">
                 {SHIFT_TYPES.map((shift) => {
                   const required = (capacityRules[day] as any)?.[shift] || 0;
                   const actual = staffingByShift[day]?.[shift] || 0;
                   const shortfall = required - actual;
 
-                  return (
-                    <div
+                  return shortfall > 0 ? (
+                    <span
                       key={`summary-${day}-${shift}`}
-                      className={`px-3 py-2 rounded text-sm font-semibold ${
-                        shortfall <= 0
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-900"
                     >
-                      <span className="text-xs block opacity-75">{SHIFT_LABELS[shift]}</span>
-                      {actual}/{required}
-                      {shortfall > 0 && <span className="block text-xs">−{shortfall} needed</span>}
-                    </div>
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400 duration-2000" />
+                      {SHIFT_LABELS[shift]} {actual}/{required}
+                    </span>
+                  ) : (
+                    <span
+                      key={`summary-${day}-${shift}`}
+                      className="inline-flex items-center rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-xs font-medium text-stone-600"
+                    >
+                      {SHIFT_LABELS[shift]} {actual}/{required}
+                    </span>
                   );
                 })}
               </div>
@@ -236,28 +245,30 @@ export default function RosterGrid({
       {/* Pending Approvals Section */}
       {pendingAvailabilities.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold text-red-bean mb-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-stone-700">
             Pending Approvals ({pendingAvailabilities.length})
           </h2>
-          {pendingAvailabilities.map((avail) => renderAvailabilityRow(avail))}
+          <div className="space-y-3">
+            {pendingAvailabilities.map((avail) => renderAvailabilityRow(avail))}
+          </div>
         </div>
       )}
 
       {/* Approved Section */}
       {approvedAvailabilities.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold text-red-bean mb-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-stone-700">
             Approved ({approvedAvailabilities.length})
           </h2>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+          <div className="space-y-3">
             {approvedAvailabilities.map((avail) => renderAvailabilityRow(avail))}
           </div>
         </div>
       )}
 
       {pendingAvailabilities.length === 0 && approvedAvailabilities.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-coffee-brown opacity-75">No availabilities submitted for this week</p>
+        <div className="rounded-xl border border-stone-200/60 bg-white py-12 text-center">
+          <p className="text-stone-500">No availabilities submitted for this week</p>
         </div>
       )}
     </div>
