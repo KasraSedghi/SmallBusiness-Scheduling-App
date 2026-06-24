@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/*
+ * Red Bean brand palette.
+ * Tailwind v4 reads theme tokens from CSS (not tailwind.config.js), so the
+ * custom cafe colors must be declared here as --color-* variables. These
+ * generate utilities like bg-red-bean, text-coffee-brown, border-light-cream.
+ */
+@theme {
+  --color-red-bean: #8B2E2E;
+  --color-dark-crimson: #6B1E1E;
+  --color-coffee-brown: #6F4E37;
+  --color-light-cream: #F5E6D3;
+  --color-white-cream: #FFF8F0;
+}
+
 * {
   margin: 0;
   padding: 0;

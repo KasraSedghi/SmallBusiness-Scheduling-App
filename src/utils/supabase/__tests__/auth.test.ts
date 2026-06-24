@@ -48,7 +48,7 @@ describe('Auth Utilities', () => {
     });
 
     it('queries profiles table with user ID', () => {
-      const query = "select('id, email, role').eq('id', userId)";
+      const query = "from('profiles').select('id, email, role').eq('id', userId)";
       expect(query).toContain('profiles');
     });
 
@@ -79,7 +79,7 @@ describe('Auth Utilities', () => {
 
     it('validates profile data structure', () => {
       const profile = { id: 'user-123', email: 'john@example.com', role: 'employee' };
-      const hasRequired = profile.id && profile.email && profile.role;
+      const hasRequired = Boolean(profile.id && profile.email && profile.role);
 
       expect(hasRequired).toBe(true);
     });
