@@ -48,6 +48,17 @@ There is no `tailwind.config.js` — Tailwind v4 reads tokens from CSS, and a st
 | `danger` | `#881337` | Under-scheduled / compliance-violation badges |
 | `caution` | `#7c2d12` | Over-scheduled badges |
 
+### Schedule shift-type accents
+Used to colour-code the weekly roster and shift pickers by shift block, for a cleaner multi-colour schedule (Employee_scheduling reference) anchored by the brand crimson.
+| Token | Hex | Use for |
+|---|---|---|
+| `shift-morning` | `#c2410c` | Opening shift (honey orange) |
+| `shift-afternoon` | `#0f766e` | Midday shift (teal) |
+| `shift-evening` | `#9f1239` | Closing shift (rose-crimson) |
+| `shift-morning-soft` / `shift-afternoon-soft` / `shift-evening-soft` | tints | Soft cell/chip fills behind the matching accent text |
+
+These three drive: the admin `RosterGrid` filled cells + gutter, the employee `ShiftSelector` selected buttons, and the gradient page headings (`bg-clip-text`). Stat-card and heading gradients combine them with `brand` (e.g. `from-brand via-shift-evening to-shift-morning`).
+
 **Note on error banners:** form-level errors (login, availability) intentionally reuse `brand`/`brand-deep` rather than `danger`. This is a deliberate brand choice already baked into every page — the crimson *is* the alert color here, not a separate red. `danger`/`caution` are reserved for the roster compliance badges in `RosterGrid`, which need to stay visually distinct from "this is brand crimson" so admins can tell a real scheduling violation apart from ordinary brand chrome.
 
 Opacity modifiers work normally on any token: `bg-brand-deep/5`, `border-success/15`, `text-ink-muted` etc.
@@ -66,13 +77,13 @@ Full-screen brand gradient (`bg-linear-to-br from-brand-deep to-brand`) with a l
 Sticky header (avatar/initials, email, week label, Sign Out button) over a `max-w-2xl` column: deadline notice banner (`brand` if passed, `warning` if upcoming) → 3-card stat row (shifts/hours/status), each card topped with an icon tile that turns `bg-success/10 text-success` once that requirement is met (and `bg-danger/10` for an invalid status) → `ShiftSelector` → Save button → avatar uploader → minimum-requirements footer note.
 
 ### ShiftSelector (`src/components/modules/ShiftSelector.tsx`)
-One `<section>` per day, each rendering 3 shift-type buttons (morning/afternoon/evening) in a `grid-cols-1 sm:grid-cols-3`. Selected state: `border-2 border-brand bg-brand-deep/5 text-brand-deep` + checkmark icon. Unselected: `border-border text-ink-soft`.
+One `<section>` per day, each rendering 3 shift-type buttons (morning/afternoon/evening) in a `grid-cols-1 sm:grid-cols-3`. Selected state is **colour-coded by shift type** to match the admin roster legend (`border-2 border-shift-* bg-shift-*-soft text-shift-*` + a matching `text-shift-*` checkmark). Unselected: `border-border text-ink-soft`.
 
 ### Admin Dashboard (`src/app/admin/dashboard/page.tsx`)
-Two-pane layout: a fixed dark sidebar (`surface-dark`/`border-dark`/`ink-on-dark*` tokens — the only place dark chrome is used) with brand mark, an icon **nav** (Roster Dashboard [active] + a `next/link` to Capacity Settings), week summary, Publish button, Sign Out button. The light main panel (`surface`) opens with a **4-up stats overview row** — Submissions / Pending Review / Approved / Coverage — each a white `rounded-2xl` card with a tonal icon tile (`bg-brand/10 text-brand`, `bg-warning/10`, `bg-success/10`, `bg-coffee/10`), big number, label, and hint. `RosterGrid` renders beneath it. **Note:** stat-card accent classes are written as full static strings (`bg-success/10 text-success`), never interpolated (`bg-${x}/10`) — Tailwind's JIT only sees complete class literals.
+Two-pane layout: a fixed dark sidebar (`surface-dark`/`border-dark`/`ink-on-dark*` tokens — the only place dark chrome is used) with brand mark, an icon **nav** (Roster Dashboard [active] + a `next/link` to Capacity Settings), week summary, Publish button, Sign Out button. The gradient heading (`bg-clip-text`) sits above a **4-up stats overview row** — Submissions / Pending Review / Approved / Coverage — each a **gradient hero tile** (centered, white text on `bg-linear-to-br` gradients: brand / shift-morning / success / shift-afternoon), with a white-circle icon and a decorative corner glow. `RosterGrid` renders beneath it. **Note:** all gradient/accent classes are written as full static strings (`from-success to-[#166534]`), never interpolated (`from-${x}`) — Tailwind's JIT only sees complete class literals.
 
 ### RosterGrid (`src/components/modules/RosterGrid.tsx`)
-Staffing summary table (shortfalls flagged with `danger`) followed by Pending/Approved sections of per-employee cards. Each card: avatar + email header with status pill (`success`/`warning`) and compliance badge (`danger`/`caution`), then a day×shift matrix with a left **shift-label gutter** (Morning/Afternoon/Evening + time range) and day-column headers; selected cells are solid `bg-brand text-cream-white` blocks (Homebase-style), empty cells a faint `text-border-strong` dash. Footer has shift/hour metrics and an Approve/Revert action.
+Opens with a **shift colour legend** (morning/afternoon/evening dots). Then a staffing summary table (shortfalls flagged with `danger`) and Pending/Approved sections of per-employee cards. Each card: avatar + email header with status pill (`success`/`warning`) and compliance badge (`danger`/`caution`), then a day×shift matrix with a left **shift-label gutter** tinted by shift type (`shift-*-soft` bg + `shift-*` text) and day-column headers; filled cells are solid colour blocks **per shift type** (`bg-shift-morning/afternoon/evening text-cream-white`), empty cells a faint `text-border-strong` dash. Footer has shift/hour metrics and an Approve/Revert action.
 
 ### Admin Capacity (`src/app/admin/capacity/page.tsx`)
 `max-w-4xl` settings page: holiday-override toggle, one card per day with 3 numeric capacity inputs, summary card, Save/Reset/Back actions.

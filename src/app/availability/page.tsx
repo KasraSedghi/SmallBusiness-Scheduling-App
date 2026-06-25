@@ -246,7 +246,9 @@ export default function AvailabilityPage() {
       </header>
 
       <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
-        <h1 className="mb-4 text-2xl font-semibold text-ink">Your Weekly Shifts</h1>
+        <h1 className="mb-4 inline-block bg-linear-to-r from-shift-morning via-brand to-shift-evening bg-clip-text text-2xl font-bold text-transparent">
+          Your Weekly Shifts
+        </h1>
 
         {/* Deadline Notice */}
         {isDeadlinePassed ? (

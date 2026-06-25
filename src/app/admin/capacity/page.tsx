@@ -201,7 +201,7 @@ export default function AdminCapacityPage() {
             </svg>
             Back to Dashboard
           </button>
-          <h1 className="mb-2 text-3xl font-bold text-brand sm:text-4xl">
+          <h1 className="mb-2 inline-block bg-linear-to-r from-brand via-shift-evening to-shift-morning bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
             Staffing Capacity Settings
           </h1>
           <p className="text-ink-soft">

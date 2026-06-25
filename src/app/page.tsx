@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUserProfile } from '@/utils/supabase/auth';
+import { getCurrentUser, getUserProfile } from '@/utils/supabase/auth';
 
 export default function PortalPage() {
   const router = useRouter();
@@ -10,26 +10,46 @@ export default function PortalPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
     const routeUser = async () => {
       try {
         const startTime = performance.now();
-        const result = await getUserProfile();
 
-        if (result.error || !result.data) {
+        // First confirm there is an authenticated session at all. Without one,
+        // send the user to login rather than spinning forever.
+        const userResult = await getCurrentUser();
+        if (userResult.error || !userResult.data) {
           router.push('/login');
           return;
         }
 
-        const endTime = performance.now();
-        const routeTime = endTime - startTime;
+        // For a just-signed-up account the profile row is created by the
+        // on_auth_user_created trigger and may not be readable on the very
+        // first query (a small replication/commit race). Retry a few times
+        // before giving up so the portal never dead-ends on the spinner.
+        let profile = null;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const result = await getUserProfile();
+          if (result.data) {
+            profile = result.data;
+            break;
+          }
+          await sleep(400);
+        }
 
-        if (result.data.role === 'admin') {
+        const routeTime = performance.now() - startTime;
+
+        if (profile?.role === 'admin') {
           router.push('/admin/dashboard');
         } else {
+          // Authenticated but profile still unresolved → default to the
+          // employee view (the trigger always provisions employees). The
+          // availability page re-checks auth on its own.
           router.push('/availability');
         }
 
-        console.log(`[Portal] Routed ${result.data.role} user in ${routeTime.toFixed(0)}ms`);
+        console.log(`[Portal] Routed ${profile?.role ?? 'employee'} user in ${routeTime.toFixed(0)}ms`);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
         console.error('Portal routing error:', err);
@@ -38,7 +58,13 @@ export default function PortalPage() {
       }
     };
 
-    routeUser();
+    // Hard safety net: never let the splash hang indefinitely.
+    const timeout = setTimeout(() => {
+      setError('This is taking longer than expected. Please sign in again.');
+      setLoading(false);
+    }, 12000);
+
+    routeUser().finally(() => clearTimeout(timeout));
   }, [router]);
 
   return (

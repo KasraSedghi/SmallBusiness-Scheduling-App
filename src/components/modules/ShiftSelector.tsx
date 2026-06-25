@@ -31,6 +31,19 @@ const SHIFT_TIMES: Record<string, { sunThu: string; friSat: string }> = {
   evening: { sunThu: '5:00 PM - 9:00 PM', friSat: '5:00 PM - 10:30 PM' },
 };
 
+// Colour-code shift buttons by type, matching the admin roster legend. Full
+// static class strings so Tailwind's JIT scanner emits them.
+const SHIFT_SELECTED_CLASSES: Record<string, string> = {
+  morning: 'border-2 border-shift-morning bg-shift-morning-soft text-shift-morning shadow-sm',
+  afternoon: 'border-2 border-shift-afternoon bg-shift-afternoon-soft text-shift-afternoon shadow-sm',
+  evening: 'border-2 border-shift-evening bg-shift-evening-soft text-shift-evening shadow-sm',
+};
+const SHIFT_CHECK_CLASSES: Record<string, string> = {
+  morning: 'text-shift-morning',
+  afternoon: 'text-shift-afternoon',
+  evening: 'text-shift-evening',
+};
+
 export function ShiftSelector({
   shiftData,
   onShiftChange,
@@ -69,7 +82,7 @@ export function ShiftSelector({
                       isLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer active:scale-95 active:duration-150'
                     } ${
                       isSelected
-                        ? 'border-2 border-brand bg-brand-deep/5 font-medium text-brand-deep shadow-sm'
+                        ? `font-medium ${SHIFT_SELECTED_CLASSES[shiftType]}`
                         : 'border border-border bg-white/90 text-ink-soft hover:border-border-strong'
                     }`}
                   >
@@ -78,16 +91,16 @@ export function ShiftSelector({
                         <div className="text-sm font-medium">
                           {shiftType.charAt(0).toUpperCase() + shiftType.slice(1)}
                         </div>
-                        <div className={`mt-0.5 text-xs ${isSelected ? 'text-brand/70' : 'text-ink-faint'}`}>
+                        <div className={`mt-0.5 text-xs ${isSelected ? 'opacity-80' : 'text-ink-faint'}`}>
                           {shiftTime}
                         </div>
-                        <div className={`text-xs ${isSelected ? 'text-brand/70' : 'text-ink-faint'}`}>
+                        <div className={`text-xs ${isSelected ? 'opacity-80' : 'text-ink-faint'}`}>
                           {hours}h
                         </div>
                       </div>
                       {isSelected && (
                         <svg
-                          className="mt-0.5 h-4 w-4 shrink-0 text-brand"
+                          className={`mt-0.5 h-4 w-4 shrink-0 ${SHIFT_CHECK_CLASSES[shiftType]}`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >

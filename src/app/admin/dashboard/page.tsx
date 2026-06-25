@@ -210,7 +210,9 @@ export default function DashboardPage() {
 
       {/* Main tracking dashboard */}
       <main className="flex-1 overflow-x-auto bg-surface/50 p-8">
-        <h1 className="mb-1 text-2xl font-semibold text-ink">Roster Matrix</h1>
+        <h1 className="mb-1 inline-block bg-linear-to-r from-brand via-shift-evening to-shift-morning bg-clip-text text-3xl font-bold text-transparent">
+          Roster Matrix
+        </h1>
         <p className="mb-6 text-sm text-ink-muted">
           Review submissions, approve coverage, and publish the final week's roster.
         </p>
@@ -222,21 +224,21 @@ export default function DashboardPage() {
               label: 'Submissions',
               value: availabilities.length,
               hint: 'this week',
-              iconClass: 'bg-brand/10 text-brand',
+              cardClass: 'from-brand to-brand-deep shadow-brand/20',
               icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
             },
             {
               label: 'Pending Review',
               value: pendingCount,
               hint: 'awaiting approval',
-              iconClass: 'bg-warning/10 text-warning',
+              cardClass: 'from-shift-morning to-[#9a3412] shadow-shift-morning/20',
               icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
             },
             {
               label: 'Approved',
               value: approvedCount,
               hint: 'ready to publish',
-              iconClass: 'bg-success/10 text-success',
+              cardClass: 'from-success to-[#166534] shadow-success/20',
               icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
             },
             {
@@ -245,24 +247,24 @@ export default function DashboardPage() {
                 ? `${Math.round((approvedCount / availabilities.length) * 100)}%`
                 : '—',
               hint: 'approved share',
-              iconClass: 'bg-coffee/10 text-coffee',
+              cardClass: 'from-shift-afternoon to-[#115e59] shadow-shift-afternoon/20',
               icon: 'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z',
             },
           ].map((stat) => (
             <div
               key={stat.label}
-              className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md"
+              className={`relative flex flex-col items-center overflow-hidden rounded-2xl bg-linear-to-br ${stat.cardClass} p-5 text-center shadow-lg transition-transform duration-200 hover:-translate-y-0.5`}
             >
-              <div
-                className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${stat.iconClass}`}
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {/* decorative glow */}
+              <div className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-cream-white/10" />
+              <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-cream-white/20 backdrop-blur-sm">
+                <svg className="h-6 w-6 text-cream-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
                 </svg>
               </div>
-              <div className="text-2xl font-semibold text-ink">{stat.value}</div>
-              <div className="mt-0.5 text-sm font-medium text-ink-soft">{stat.label}</div>
-              <div className="text-xs text-ink-faint">{stat.hint}</div>
+              <div className="relative text-3xl font-bold leading-none text-cream-white">{stat.value}</div>
+              <div className="relative mt-1.5 text-sm font-semibold text-cream-white">{stat.label}</div>
+              <div className="relative text-xs text-cream-white/70">{stat.hint}</div>
             </div>
           ))}
         </div>

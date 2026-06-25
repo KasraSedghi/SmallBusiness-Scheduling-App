@@ -38,6 +38,20 @@
   --color-warning: #78350f; /* deadline notices, holiday mode */
   --color-danger: #881337; /* under-scheduled / compliance violations */
   --color-caution: #7c2d12; /* over-scheduled */
+
+  /*
+   * Schedule shift-type accents — colour-code the weekly roster by shift block
+   * (morning/afternoon/evening) the way the Employee_scheduling reference does.
+   * Warm, café-leaning hues anchored by the brand crimson on the evening close.
+   */
+  --color-shift-morning: #c2410c; /* honey orange — opening shift */
+  --color-shift-afternoon: #0f766e; /* teal — midday shift */
+  --color-shift-evening: #9f1239; /* rose-crimson — closing shift */
+
+  /* Soft tints of the shift accents for cell fills / chips */
+  --color-shift-morning-soft: #ffedd5;
+  --color-shift-afternoon-soft: #ccfbf1;
+  --color-shift-evening-soft: #ffe4e6;
 }
 
 * {
