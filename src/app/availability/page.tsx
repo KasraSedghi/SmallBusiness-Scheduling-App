@@ -207,7 +207,7 @@ export default function AvailabilityPage() {
     <div className="min-h-screen bg-surface">
       {/* Sticky header: employee profile section */}
       <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3 min-w-0">
             {avatarUrl ? (
               <img
@@ -245,7 +245,7 @@ export default function AvailabilityPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
         <h1 className="mb-4 inline-block bg-linear-to-r from-shift-morning via-brand to-shift-evening bg-clip-text text-2xl font-bold text-transparent">
           Your Weekly Shifts
         </h1>
@@ -280,56 +280,6 @@ export default function AvailabilityPage() {
           </div>
         )}
 
-        {/* Requirements & Stats */}
-        <div className="mb-5 grid grid-cols-3 gap-3">
-          <div className="rounded-xl border border-border bg-white/90 p-4 text-center">
-            <div
-              className={`mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-lg ${
-                totalShifts >= 2 ? 'bg-success/10 text-success' : 'bg-surface-muted text-ink-faint'
-              }`}
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div className="text-2xl font-semibold text-ink">{totalShifts}</div>
-            <div className="mt-1 text-xs text-ink-muted">Shifts Selected</div>
-            <div className="mt-0.5 text-xs text-ink-faint">Min: 2</div>
-          </div>
-          <div className="rounded-xl border border-border bg-white/90 p-4 text-center">
-            <div
-              className={`mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-lg ${
-                totalHours >= 8 ? 'bg-success/10 text-success' : 'bg-surface-muted text-ink-faint'
-              }`}
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="text-2xl font-semibold text-ink">{totalHours.toFixed(1)}</div>
-            <div className="mt-1 text-xs text-ink-muted">Hours</div>
-            <div className="mt-0.5 text-xs text-ink-faint">Min: 8</div>
-          </div>
-          <div className="rounded-xl border border-border bg-white/90 p-4 text-center">
-            <div
-              className={`mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-lg ${
-                validation.isValid ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
-              }`}
-            >
-              <span className="text-base font-bold">{validation.isValid ? '✓' : '✕'}</span>
-            </div>
-            <div
-              className={`text-base font-semibold ${
-                validation.isValid ? 'text-success' : 'text-danger'
-              }`}
-            >
-              {validation.isValid ? 'Valid' : 'Invalid'}
-            </div>
-            <div className="mt-1 text-xs text-ink-muted">Status</div>
-            <div className="mt-0.5 text-xs text-ink-faint">Requirements</div>
-          </div>
-        </div>
-
         {/* Error Banner */}
         {error && (
           <div className="mb-5 rounded-xl border border-brand/15 bg-brand-deep/5 p-4">
@@ -344,28 +294,127 @@ export default function AvailabilityPage() {
           </div>
         )}
 
-        {/* Shift Selector */}
-        <div className="mb-6">
-          <ShiftSelector
-            shiftData={shiftData}
-            onShiftChange={handleShiftChange}
-            isLocked={isDeadlinePassed}
-          />
-        </div>
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+          {/* Left: Requirements */}
+          <div className="rounded-2xl border border-border bg-white/90 p-6">
+            <h2 className="mb-5 text-xl font-bold text-ink">Weekly Requirements</h2>
 
-        {/* Save Button */}
-        <div className="flex gap-3">
-          <button
-            onClick={handleSave}
-            disabled={isDeadlinePassed || saving || !validation.isValid}
-            className={`flex-1 transform rounded-xl py-3 font-medium transition-all duration-300 ${
-              isDeadlinePassed || saving || !validation.isValid
-                ? 'cursor-not-allowed bg-border text-ink-faint'
-                : 'bg-linear-to-r from-brand-deep to-brand text-cream-white shadow-md shadow-brand-deep/10 hover:-translate-y-0.5 hover:from-brand hover:to-rose-900 active:scale-[0.98]'
-            }`}
-          >
-            {saving ? 'Saving...' : 'Save Availability'}
-          </button>
+            <div className="space-y-4">
+              <div
+                className={`flex items-center gap-4 rounded-xl p-4 ${
+                  totalShifts >= 2 ? 'bg-success/10' : 'bg-surface-muted'
+                }`}
+              >
+                <div
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${
+                    totalShifts >= 2 ? 'bg-success/15 text-success' : 'bg-white text-ink-faint'
+                  }`}
+                >
+                  <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-ink-muted">Shifts Selected</p>
+                  <p className={`text-4xl font-extrabold leading-none ${totalShifts >= 2 ? 'text-success' : 'text-ink'}`}>
+                    {totalShifts}
+                    <span className="text-base font-medium text-ink-faint"> / 2 min</span>
+                  </p>
+                </div>
+                {totalShifts >= 2 && <span className="text-3xl text-success">✓</span>}
+              </div>
+
+              <div
+                className={`flex items-center gap-4 rounded-xl p-4 ${
+                  totalHours >= 8 ? 'bg-success/10' : 'bg-surface-muted'
+                }`}
+              >
+                <div
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${
+                    totalHours >= 8 ? 'bg-success/15 text-success' : 'bg-white text-ink-faint'
+                  }`}
+                >
+                  <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-ink-muted">Hours</p>
+                  <p className={`text-4xl font-extrabold leading-none ${totalHours >= 8 ? 'text-success' : 'text-ink'}`}>
+                    {totalHours.toFixed(1)}
+                    <span className="text-base font-medium text-ink-faint"> / 8 min</span>
+                  </p>
+                </div>
+                {totalHours >= 8 && <span className="text-3xl text-success">✓</span>}
+              </div>
+
+              <div
+                className={`flex items-center gap-4 rounded-xl p-4 ${
+                  validation.isValid ? 'bg-success/10' : 'bg-danger/10'
+                }`}
+              >
+                <div
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl font-bold ${
+                    validation.isValid ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'
+                  }`}
+                >
+                  {validation.isValid ? '✓' : '✕'}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-ink-muted">Status</p>
+                  <p className={`text-2xl font-extrabold leading-none ${validation.isValid ? 'text-success' : 'text-danger'}`}>
+                    {validation.isValid ? 'Valid' : 'Invalid'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-7 border-t border-border pt-6">
+              <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-ink-muted">
+                The Rules
+              </h3>
+              <ul className="space-y-3">
+                {[
+                  'At least 2 shifts per week',
+                  'At least 8 hours total per week',
+                  'Maximum 40 hours per week',
+                  'Each shift is at least 3 hours',
+                ].map((rule) => (
+                  <li key={rule} className="flex items-center gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
+                      ✓
+                    </span>
+                    <span className="text-base font-medium text-ink-soft">{rule}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Right: Scheduling */}
+          <div className="rounded-2xl border border-border bg-white/90 p-6">
+            <h2 className="mb-5 text-xl font-bold text-ink">Pick Your Shifts</h2>
+
+            <div className="mb-6">
+              <ShiftSelector
+                shiftData={shiftData}
+                onShiftChange={handleShiftChange}
+                isLocked={isDeadlinePassed}
+              />
+            </div>
+
+            <button
+              onClick={handleSave}
+              disabled={isDeadlinePassed || saving || !validation.isValid}
+              className={`w-full transform rounded-xl py-3 font-medium transition-all duration-300 ${
+                isDeadlinePassed || saving || !validation.isValid
+                  ? 'cursor-not-allowed bg-border text-ink-faint'
+                  : 'bg-linear-to-r from-brand-deep to-brand text-cream-white shadow-md shadow-brand-deep/10 hover:-translate-y-0.5 hover:from-brand hover:to-rose-900 active:scale-[0.98]'
+              }`}
+            >
+              {saving ? 'Saving...' : 'Save Availability'}
+            </button>
+          </div>
         </div>
 
         {/* Avatar settings */}
@@ -380,17 +429,6 @@ export default function AvailabilityPage() {
             />
           </div>
         )}
-
-        {/* Minimum Requirements Info */}
-        <div className="mt-6 rounded-xl bg-surface-muted p-4 text-sm text-ink-soft">
-          <h3 className="mb-2 font-semibold text-ink-soft">Minimum Requirements</h3>
-          <ul className="space-y-1 text-ink-muted">
-            <li>• At least 2 shifts per week</li>
-            <li>• At least 8 hours total per week</li>
-            <li>• Maximum 40 hours per week</li>
-            <li>• Each shift is at least 3 hours</li>
-          </ul>
-        </div>
       </div>
     </div>
   );

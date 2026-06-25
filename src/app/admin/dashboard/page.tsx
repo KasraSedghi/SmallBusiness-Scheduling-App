@@ -135,28 +135,28 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-surface">
       {/* Sidebar */}
-      <aside className="flex h-screen w-64 shrink-0 flex-col justify-between border-r border-border-dark bg-surface-dark p-6 text-ink-on-dark">
+      <aside className="flex h-screen w-72 shrink-0 flex-col justify-between border-r border-border-dark bg-surface-dark p-7 text-ink-on-dark">
         <div>
-          <div className="mb-8 flex items-center gap-2">
-            <span className="text-2xl">🫘</span>
+          <div className="mb-10 flex items-center gap-3">
+            <span className="text-3xl">🫘</span>
             <div>
-              <p className="text-sm font-semibold leading-tight">The Red Bean</p>
-              <p className="text-xs font-light text-ink-on-dark-muted">Admin Console</p>
+              <p className="text-lg font-bold leading-tight">The Red Bean</p>
+              <p className="text-sm font-light text-ink-on-dark-muted">Admin Console</p>
             </div>
           </div>
 
-          <nav className="space-y-1">
-            <div className="flex items-center gap-3 rounded-lg bg-border-dark px-3 py-2 text-sm font-medium text-ink-on-dark">
-              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <nav className="space-y-2">
+            <div className="flex items-center gap-4 rounded-xl bg-border-dark px-4 py-3.5 text-base font-semibold text-ink-on-dark">
+              <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
               </svg>
               Roster Dashboard
             </div>
             <Link
               href="/admin/capacity"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-on-dark-muted transition-colors hover:bg-border-dark/60 hover:text-ink-on-dark"
+              className="flex items-center gap-4 rounded-xl px-4 py-3.5 text-base font-semibold text-ink-on-dark-muted transition-colors hover:bg-border-dark/60 hover:text-ink-on-dark"
             >
-              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -164,22 +164,22 @@ export default function DashboardPage() {
             </Link>
           </nav>
 
-          <div className="mt-8 rounded-xl border border-border-dark bg-border-dark/50 p-4">
-            <p className="text-xs uppercase tracking-wider text-ink-on-dark-muted">Week of</p>
-            <p className="mt-1 text-sm font-semibold text-ink-on-dark">
+          <div className="mt-10 rounded-2xl border border-border-dark bg-border-dark/50 p-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-ink-on-dark-muted">Week of</p>
+            <p className="mt-1.5 text-base font-bold text-ink-on-dark">
               {new Date(weekStarting).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',
               })}
             </p>
-            <div className="mt-3 flex items-center justify-between text-xs">
+            <div className="mt-4 flex items-center justify-between text-sm">
               <span className="text-ink-on-dark-muted">Approved</span>
-              <span className="font-semibold text-ink-on-dark">{approvedCount}</span>
+              <span className="font-bold text-ink-on-dark">{approvedCount}</span>
             </div>
-            <div className="mt-1 flex items-center justify-between text-xs">
+            <div className="mt-2 flex items-center justify-between text-sm">
               <span className="text-ink-on-dark-muted">Pending</span>
-              <span className="font-semibold text-ink-on-dark">{pendingCount}</span>
+              <span className="font-bold text-ink-on-dark">{pendingCount}</span>
             </div>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
           <button
             onClick={handlePublish}
             disabled={publishing || availabilities.length === 0}
-            className={`w-full rounded-xl px-6 py-3 text-sm font-medium shadow-md shadow-brand-deep/10 transition-all duration-200 active:scale-[0.98] ${
+            className={`w-full rounded-xl px-6 py-3.5 text-base font-semibold shadow-md shadow-brand-deep/10 transition-all duration-200 active:scale-[0.98] ${
               publishing || availabilities.length === 0
                 ? 'cursor-not-allowed bg-border-dark text-ink-on-dark-muted'
                 : 'bg-linear-to-r from-brand-deep to-brand text-cream-white hover:from-brand'
@@ -201,7 +201,7 @@ export default function DashboardPage() {
               await signOut();
               router.push('/');
             }}
-            className="w-full rounded-lg px-3 py-2 text-sm font-medium text-ink-on-dark-muted transition-colors hover:bg-border-dark hover:text-ink-on-dark"
+            className="w-full rounded-xl px-4 py-3 text-base font-semibold text-ink-on-dark-muted transition-colors hover:bg-border-dark hover:text-ink-on-dark"
           >
             Sign Out
           </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Availability, TimeOffRequest, ShiftCapacity } from '@/types/index';
 import { calculateScheduleMetrics, getConstraintStatus } from '@/utils/helpers/validation';
 import AvatarDisplay from '@/components/ui/AvatarDisplay';
@@ -40,6 +40,14 @@ const SHIFT_DOT_CLASSES: Record<string, string> = {
   evening: 'bg-shift-evening',
 };
 
+// Big vibrant gradient tiles for the staffing summary bubbles, matching the
+// dashboard's hero stat cards. Full static strings for Tailwind's JIT scanner.
+const SHIFT_SUMMARY_GRADIENT: Record<string, string> = {
+  morning: 'bg-linear-to-br from-shift-morning to-[#9a3412] shadow-shift-morning/30',
+  afternoon: 'bg-linear-to-br from-shift-afternoon to-[#115e59] shadow-shift-afternoon/30',
+  evening: 'bg-linear-to-br from-shift-evening to-brand-deep shadow-shift-evening/30',
+};
+
 interface RosterGridProps {
   availabilities: (Availability & { profile?: any })[];
   capacityRules: Record<string, ShiftCapacity>;
@@ -55,12 +63,23 @@ export default function RosterGrid({
   weekStarting,
   onApprovalChange,
 }: RosterGridProps) {
-  // Calculate staffing levels per shift
+  // Which shift bubble (if any) is expanded to show its assigned employees.
+  const [selectedShift, setSelectedShift] = useState<{ day: string; shift: string } | null>(
+    null
+  );
+
+  // Calculate staffing levels per shift, and who's actually on each one.
   const staffingByShift: Record<string, Record<string, number>> = {};
+  const shiftAssignments: Record<
+    string,
+    Record<string, { id: string; email: string; avatarUrl?: string | null }[]>
+  > = {};
   DAYS_OF_WEEK.forEach((day) => {
     staffingByShift[day] = {};
+    shiftAssignments[day] = {};
     SHIFT_TYPES.forEach((shift) => {
       staffingByShift[day][shift] = 0;
+      shiftAssignments[day][shift] = [];
     });
   });
 
@@ -70,6 +89,11 @@ export default function RosterGrid({
         SHIFT_TYPES.forEach((shift) => {
           if ((avail.shift_data as any)[day]?.[shift]) {
             staffingByShift[day][shift]++;
+            shiftAssignments[day][shift].push({
+              id: avail.profile_id,
+              email: avail.profile?.email || 'Unknown Employee',
+              avatarUrl: avail.profile?.avatar_url,
+            });
           }
         });
       });
@@ -217,45 +241,97 @@ export default function RosterGrid({
   // Calculate shift staffing summary
   const renderStaffingSummary = () => {
     return (
-      <div className="overflow-hidden rounded-xl border border-border/60 bg-white">
-        <div className="border-b border-border/60 bg-surface-muted/80 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-soft">
+      <div className="overflow-hidden rounded-2xl border border-border/60 bg-white">
+        <div className="border-b border-border/60 bg-surface-muted/80 px-6 py-4">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-ink-soft">
             Shift Staffing Summary
           </h3>
+          <p className="mt-0.5 text-xs text-ink-muted">
+            Tap a shift to see who&apos;s scheduled for it
+          </p>
         </div>
-        <div className="divide-y divide-border/60">
-          {DAYS_OF_WEEK.map((day) => (
-            <div
-              key={`summary-${day}`}
-              className="flex items-center gap-4 p-4 transition-colors duration-150 hover:bg-orange-50/40"
-            >
-              <div className="w-20 text-sm font-semibold text-ink-soft">{DAY_LABELS[day]}</div>
-              <div className="flex flex-1 gap-3">
-                {SHIFT_TYPES.map((shift) => {
-                  const required = (capacityRules[day] as any)?.[shift] || 0;
-                  const actual = staffingByShift[day]?.[shift] || 0;
-                  const shortfall = required - actual;
+        <div className="space-y-7 p-6">
+          {DAYS_OF_WEEK.map((day) => {
+            const isExpandedDay = selectedShift?.day === day;
+            const expandedAssignments = isExpandedDay
+              ? shiftAssignments[day][selectedShift!.shift]
+              : [];
 
-                  return shortfall > 0 ? (
-                    <span
-                      key={`summary-${day}-${shift}`}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-danger/20 bg-danger/5 px-2.5 py-1 text-xs font-medium text-danger"
-                    >
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-danger/60 duration-2000" />
-                      {SHIFT_LABELS[shift]} {actual}/{required}
-                    </span>
-                  ) : (
-                    <span
-                      key={`summary-${day}-${shift}`}
-                      className="inline-flex items-center rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-ink-soft"
-                    >
-                      {SHIFT_LABELS[shift]} {actual}/{required}
-                    </span>
-                  );
-                })}
+            return (
+              <div key={`summary-${day}`}>
+                <h4 className="mb-3 text-base font-bold text-ink">{DAY_LABELS[day]}</h4>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  {SHIFT_TYPES.map((shift) => {
+                    const required = (capacityRules[day] as any)?.[shift] || 0;
+                    const actual = staffingByShift[day]?.[shift] || 0;
+                    const shortfall = required - actual;
+                    const isSelected =
+                      selectedShift?.day === day && selectedShift?.shift === shift;
+
+                    return (
+                      <button
+                        key={`summary-${day}-${shift}`}
+                        type="button"
+                        onClick={() => setSelectedShift(isSelected ? null : { day, shift })}
+                        className={`relative flex flex-col items-center justify-center rounded-2xl p-6 text-center text-cream-white transition-all duration-300 ${SHIFT_SUMMARY_GRADIENT[shift]} ${
+                          isSelected
+                            ? 'z-10 scale-[1.06] shadow-2xl ring-4 ring-cream-white/70'
+                            : 'shadow-md hover:-translate-y-0.5 hover:shadow-xl'
+                        }`}
+                      >
+                        {shortfall > 0 && (
+                          <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-danger text-xs font-bold text-cream-white shadow-md ring-2 ring-white">
+                            {shortfall}
+                          </span>
+                        )}
+                        <span className="text-xs font-bold uppercase tracking-wider text-cream-white/80">
+                          {shift}
+                        </span>
+                        <span className="mt-1 text-4xl font-extrabold leading-none">
+                          {actual}
+                          <span className="text-lg font-medium text-cream-white/70">
+                            /{required}
+                          </span>
+                        </span>
+                        <span className="mt-1.5 text-[11px] font-medium text-cream-white/70">
+                          {SHIFT_LABELS[shift]}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {isExpandedDay && (
+                  <div className="mt-3 rounded-xl border border-border/60 bg-surface-muted/60 p-4 duration-300 animate-in fade-in slide-in-from-top-2">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                      {DAY_LABELS[day]} · {selectedShift!.shift} ·{' '}
+                      {SHIFT_LABELS[selectedShift!.shift]}
+                    </p>
+                    {expandedAssignments.length === 0 ? (
+                      <p className="text-sm text-ink-faint">No one scheduled yet</p>
+                    ) : (
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {expandedAssignments.map((emp) => (
+                          <div
+                            key={`${emp.id}-${day}-${selectedShift!.shift}`}
+                            className="flex items-center gap-3 rounded-lg bg-white px-3 py-2 shadow-sm"
+                          >
+                            <AvatarDisplay email={emp.email} avatarUrl={emp.avatarUrl} size="sm" />
+                            <div>
+                              <p className="text-sm font-medium text-ink">{emp.email}</p>
+                              <p className="text-[11px] text-ink-faint">
+                                ID: {emp.id.substring(0, 8)}...
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );
