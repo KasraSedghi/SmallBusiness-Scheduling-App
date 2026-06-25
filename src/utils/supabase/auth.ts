@@ -34,19 +34,9 @@ export async function signUpWithEmail(
     return { data: null, error: 'Signup failed: no user returned' };
   }
 
-  // Create profile for new user (always employee role)
-  try {
-    const profileData: any = {
-      id: data.user.id,
-      email,
-      role: 'employee', // Always employee - admin accounts created separately
-      avatar_url: null,
-    };
-    await supabase.from('profiles').insert(profileData);
-  } catch (profileError) {
-    console.error('Failed to create profile:', profileError);
-    return { data: null, error: 'Failed to create user profile' };
-  }
+  // Profile row is created server-side by the on_auth_user_created trigger
+  // (see supabase/migrations/006_handle_new_user_trigger.sql), since RLS
+  // would otherwise block this insert until the user confirms their email.
 
   return {
     data: { id: data.user.id, email: data.user.email || email },

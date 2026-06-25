@@ -3,12 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserProfile } from '@/utils/supabase/auth';
-import LandingHero from '@/components/modules/LandingHero';
-import ScheduleSection from '@/components/modules/ScheduleSection';
 
 export default function PortalPage() {
   const router = useRouter();
-  const [status, setStatus] = useState<'checking' | 'loggedOut' | 'error'>('checking');
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -18,7 +16,7 @@ export default function PortalPage() {
         const result = await getUserProfile();
 
         if (result.error || !result.data) {
-          setStatus('loggedOut');
+          router.push('/login');
           return;
         }
 
@@ -36,26 +34,17 @@ export default function PortalPage() {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
         console.error('Portal routing error:', err);
         setError(errorMsg);
-        setStatus('error');
+        setLoading(false);
       }
     };
 
     routeUser();
   }, [router]);
 
-  if (status === 'loggedOut') {
-    return (
-      <>
-        <LandingHero />
-        <ScheduleSection />
-      </>
-    );
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-red-bean to-dark-crimson px-4">
       <div className="text-center max-w-md">
-        {status === 'checking' && (
+        {loading && !error && (
           <>
             <div className="w-16 h-16 border-4 border-light-cream border-t-white-cream rounded-full animate-spin mx-auto mb-6"></div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white-cream mb-2">
@@ -65,7 +54,7 @@ export default function PortalPage() {
           </>
         )}
 
-        {status === 'error' && (
+        {error && (
           <>
             <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center mx-auto mb-6">
               <svg
