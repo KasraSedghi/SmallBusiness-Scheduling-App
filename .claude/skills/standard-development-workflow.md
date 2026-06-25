@@ -3,6 +3,7 @@
 ## Discovery Phase
 - Before editing or writing a service, locate and read its design documentation. If no document exists, analyze the local file context thoroughly.
 - Ask questions to clarify ambiguity. Do not make blind assumptions about business logic or architecture.
+- Make sure to not hard code routings 
 
 ## Scope & Token Efficiency
 - Do not make unauthorized changes outside the scope of the original prompt.

@@ -127,7 +127,7 @@ export default function LoginPage() {
         }
 
         if (result.data?.id) {
-          router.push('/availability');
+          router.push('/');
         }
       } catch (err) {
         setError('An unexpected error occurred. Please try again.');
@@ -200,7 +200,7 @@ export default function LoginPage() {
 
         if (result.data?.id) {
           setSuccess('Account created! Redirecting to your schedule...');
-          setTimeout(() => router.push('/availability'), 800);
+          setTimeout(() => router.push('/'), 800);
         }
       } catch (err) {
         setError('An unexpected error occurred. Please try again.');

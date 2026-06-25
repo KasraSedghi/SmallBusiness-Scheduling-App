@@ -59,14 +59,10 @@ export async function middleware(request: NextRequest) {
   // Check role-based access for protected routes
   for (const [route, allowedRoles] of Object.entries(PROTECTED_ROUTES)) {
     if (pathname.startsWith(route)) {
-      if (!user.email) {
-        return NextResponse.redirect(new URL('/login', request.url));
-      }
-
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
-        .eq('email', user.email)
+        .eq('id', user.id)
         .single();
 
       if (!profile || !allowedRoles.includes((profile as any).role)) {
