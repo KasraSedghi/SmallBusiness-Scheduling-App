@@ -180,8 +180,8 @@ export default function AdminCapacityPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-light-cream border-t-red-bean rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-coffee-brown">Loading capacity settings...</p>
+          <div className="w-12 h-12 border-4 border-border border-t-brand rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-ink-soft">Loading capacity settings...</p>
         </div>
       </div>
     );
@@ -192,10 +192,19 @@ export default function AdminCapacityPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-red-bean mb-2">
+          <button
+            onClick={() => router.push('/admin/dashboard')}
+            className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted transition-colors hover:text-brand"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Dashboard
+          </button>
+          <h1 className="mb-2 text-3xl font-bold text-brand sm:text-4xl">
             Staffing Capacity Settings
           </h1>
-          <p className="text-coffee-brown">
+          <p className="text-ink-soft">
             Week of {new Date(weekStarting).toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'short',
@@ -206,24 +215,24 @@ export default function AdminCapacityPage() {
 
         {/* Error Banner */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-bean rounded-r-lg">
-            <p className="text-sm font-semibold text-red-bean">{error}</p>
+          <div className="mb-6 p-4 bg-brand-deep/5 border-l-4 border-brand rounded-r-lg">
+            <p className="text-sm font-semibold text-brand">{error}</p>
           </div>
         )}
 
         {/* Success Banner */}
         {successMessage && (
-          <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-600 rounded-r-lg">
-            <p className="text-sm font-semibold text-green-700">{successMessage}</p>
+          <div className="mb-6 p-4 bg-success/5 border-l-4 border-success rounded-r-lg">
+            <p className="text-sm font-semibold text-success">{successMessage}</p>
           </div>
         )}
 
         {/* Holiday Override Toggle */}
-        <div className="mb-8 bg-white rounded-lg p-6 border border-light-cream">
+        <div className="mb-8 bg-white rounded-lg p-6 border border-border">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-red-bean mb-1">Holiday Override</h2>
-              <p className="text-sm text-coffee-brown opacity-75">
+              <h2 className="text-lg font-semibold text-brand mb-1">Holiday Override</h2>
+              <p className="text-sm text-ink-soft opacity-75">
                 {isHoliday
                   ? 'All shifts set to 6 staff. Custom values are saved and will be restored when disabled.'
                   : 'Enable to set all shifts to 6 staff for holiday weeks.'}
@@ -232,7 +241,7 @@ export default function AdminCapacityPage() {
             <button
               onClick={toggleHoliday}
               className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                isHoliday ? 'bg-red-bean' : 'bg-light-cream'
+                isHoliday ? 'bg-brand' : 'bg-surface-muted'
               }`}
             >
               <span
@@ -247,13 +256,13 @@ export default function AdminCapacityPage() {
         {/* Capacity Settings Grid */}
         <div className="grid grid-cols-1 gap-6 mb-8">
           {DAYS_OF_WEEK.map((day) => (
-            <div key={day} className="bg-white rounded-lg p-6 border border-light-cream">
-              <h3 className="text-lg font-semibold text-red-bean mb-4">{DAY_LABELS[day]}</h3>
+            <div key={day} className="bg-white rounded-lg p-6 border border-border">
+              <h3 className="text-lg font-semibold text-brand mb-4">{DAY_LABELS[day]}</h3>
 
               <div className="grid grid-cols-3 gap-4">
                 {SHIFT_TYPES.map((shiftType) => (
                   <div key={`${day}-${shiftType}`}>
-                    <label className="block text-xs font-medium text-coffee-brown mb-2 uppercase">
+                    <label className="block text-xs font-medium text-ink-soft mb-2 uppercase">
                       {(SHIFT_LABELS as any)[shiftType]}
                     </label>
                     <input
@@ -265,10 +274,10 @@ export default function AdminCapacityPage() {
                         updateCapacity(day, shiftType, parseInt(e.target.value, 10) || 0)
                       }
                       disabled={isHoliday}
-                      className={`w-full px-3 py-3 border border-light-cream rounded-lg text-center font-semibold text-lg transition-colors ${
+                      className={`w-full px-3 py-3 border border-border rounded-lg text-center font-semibold text-lg transition-colors ${
                         isHoliday
                           ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                          : 'bg-white text-red-bean focus:outline-none focus:border-red-bean'
+                          : 'bg-white text-brand focus:outline-none focus:border-brand'
                       }`}
                     />
                   </div>
@@ -287,9 +296,9 @@ export default function AdminCapacityPage() {
         </div>
 
         {/* Summary Card */}
-        <div className="bg-light-cream rounded-lg p-6 mb-8">
-          <h3 className="text-lg font-semibold text-coffee-brown mb-4">Summary</h3>
-          <div className="space-y-2 text-sm text-coffee-brown">
+        <div className="bg-surface-muted rounded-lg p-6 mb-8">
+          <h3 className="text-lg font-semibold text-ink-soft mb-4">Summary</h3>
+          <div className="space-y-2 text-sm text-ink-soft">
             <p>
               <span className="font-semibold">Total shifts configured:</span>{' '}
               {DAYS_OF_WEEK.length * SHIFT_TYPES.length}
@@ -311,8 +320,8 @@ export default function AdminCapacityPage() {
             disabled={saving}
             className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
               saving
-                ? 'bg-light-cream text-coffee-brown opacity-50 cursor-not-allowed'
-                : 'bg-red-bean text-white-cream hover:bg-dark-crimson active:scale-95'
+                ? 'bg-surface-muted text-ink-soft opacity-50 cursor-not-allowed'
+                : 'bg-brand text-cream-white hover:bg-brand-deep active:scale-95'
             }`}
           >
             {saving ? 'Saving...' : 'Save Changes'}
@@ -320,21 +329,21 @@ export default function AdminCapacityPage() {
 
           <button
             onClick={handleResetToDefaults}
-            className="px-4 py-3 rounded-lg font-semibold border border-coffee-brown text-coffee-brown hover:bg-light-cream transition-all"
+            className="px-4 py-3 rounded-lg font-semibold border border-ink-soft text-ink-soft hover:bg-surface-muted transition-all"
           >
             Reset to Defaults
           </button>
 
           <button
             onClick={() => router.push('/')}
-            className="px-4 py-3 rounded-lg font-semibold border border-coffee-brown text-coffee-brown hover:bg-light-cream transition-all"
+            className="px-4 py-3 rounded-lg font-semibold border border-ink-soft text-ink-soft hover:bg-surface-muted transition-all"
           >
             Back
           </button>
         </div>
 
         {/* Info Section */}
-        <div className="p-4 bg-light-cream rounded-lg text-sm text-coffee-brown">
+        <div className="p-4 bg-surface-muted rounded-lg text-sm text-ink-soft">
           <h3 className="font-semibold mb-2">Default Configuration</h3>
           <ul className="space-y-1 opacity-70">
             <li>• Weekdays (Mon-Thu): 4 staff per shift</li>

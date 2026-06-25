@@ -46,7 +46,7 @@ export function ShiftSelector({
 
         return (
           <section key={day.key}>
-            <h3 className="mb-2 px-1 text-sm font-semibold text-stone-700">
+            <h3 className="mb-2 px-1 text-sm font-semibold text-ink-soft">
               {day.label}
             </h3>
 
@@ -69,8 +69,8 @@ export function ShiftSelector({
                       isLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer active:scale-95 active:duration-150'
                     } ${
                       isSelected
-                        ? 'border-2 border-red-900 bg-red-950/5 font-medium text-red-950 shadow-sm'
-                        : 'border border-stone-200 bg-white/90 text-stone-700 hover:border-stone-300'
+                        ? 'border-2 border-brand bg-brand-deep/5 font-medium text-brand-deep shadow-sm'
+                        : 'border border-border bg-white/90 text-ink-soft hover:border-border-strong'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -78,16 +78,16 @@ export function ShiftSelector({
                         <div className="text-sm font-medium">
                           {shiftType.charAt(0).toUpperCase() + shiftType.slice(1)}
                         </div>
-                        <div className={`mt-0.5 text-xs ${isSelected ? 'text-red-900/70' : 'text-stone-400'}`}>
+                        <div className={`mt-0.5 text-xs ${isSelected ? 'text-brand/70' : 'text-ink-faint'}`}>
                           {shiftTime}
                         </div>
-                        <div className={`text-xs ${isSelected ? 'text-red-900/70' : 'text-stone-400'}`}>
+                        <div className={`text-xs ${isSelected ? 'text-brand/70' : 'text-ink-faint'}`}>
                           {hours}h
                         </div>
                       </div>
                       {isSelected && (
                         <svg
-                          className="mt-0.5 h-4 w-4 shrink-0 text-red-900"
+                          className="mt-0.5 h-4 w-4 shrink-0 text-brand"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >

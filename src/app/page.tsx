@@ -42,23 +42,31 @@ export default function PortalPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-red-bean to-dark-crimson px-4">
-      <div className="text-center max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-br from-brand-deep to-brand px-4">
+      {/* Ambient brand glow */}
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(245,230,211,0.10)_0%,transparent_70%)] blur-3xl" />
+
+      <div className="relative z-10 max-w-md text-center">
         {loading && !error && (
           <>
-            <div className="w-16 h-16 border-4 border-light-cream border-t-white-cream rounded-full animate-spin mx-auto mb-6"></div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white-cream mb-2">
-              Red Bean Scheduler
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-cream-white/10 shadow-lg backdrop-blur-sm">
+              <span className="animate-pulse text-3xl">🫘</span>
+            </div>
+            <h1 className="mb-2 text-2xl font-semibold tracking-tight text-cream-white sm:text-3xl">
+              The Red Bean
             </h1>
-            <p className="text-light-cream">Preparing your portal...</p>
+            <p className="text-sm font-light tracking-wide text-cream">Preparing your portal…</p>
+            <div className="mx-auto mt-6 h-1 w-32 overflow-hidden rounded-full bg-cream-white/15">
+              <div className="h-full w-1/2 animate-pulse rounded-full bg-cream-white/70" />
+            </div>
           </>
         )}
 
         {error && (
           <>
-            <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center mx-auto mb-6">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-cream-white/10 backdrop-blur-sm">
               <svg
-                className="w-8 h-8 text-white-cream"
+                className="h-8 w-8 text-cream-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -71,13 +79,13 @@ export default function PortalPage() {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white-cream mb-2">
-              Oops!
+            <h1 className="mb-2 text-2xl font-semibold tracking-tight text-cream-white sm:text-3xl">
+              Something went wrong
             </h1>
-            <p className="text-light-cream mb-6">{error}</p>
+            <p className="mb-6 text-sm font-light text-cream">{error}</p>
             <button
-              onClick={() => window.location.href = '/login'}
-              className="px-6 py-2 bg-white-cream text-red-bean font-semibold rounded-lg hover:bg-light-cream transition"
+              onClick={() => (window.location.href = '/login')}
+              className="rounded-xl bg-cream-white px-6 py-2.5 font-medium text-brand shadow-md transition-all duration-200 hover:bg-cream active:scale-[0.98]"
             >
               Go to Login
             </button>

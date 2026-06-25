@@ -1,17 +1,43 @@
 @import "tailwindcss";
 
 /*
- * Red Bean brand palette.
- * Tailwind v4 reads theme tokens from CSS (not tailwind.config.js), so the
- * custom cafe colors must be declared here as --color-* variables. These
- * generate utilities like bg-red-bean, text-coffee-brown, border-light-cream.
+ * Red Bean design tokens — single source of truth for theming.
+ * Tailwind v4 reads theme tokens from CSS (not tailwind.config.js, which this
+ * project no longer has), so every brand/semantic color is declared here as a
+ * --color-* variable. Each generates matching bg-, text-, and border- utilities.
+ * Components should reach for these names instead of raw Tailwind palette
+ * classes (bg-stone-50, text-red-900, etc.) so the palette only has one place
+ * to change and a shared vocabulary across pages.
  */
 @theme {
-  --color-red-bean: #8B2E2E;
-  --color-dark-crimson: #6B1E1E;
-  --color-coffee-brown: #6F4E37;
-  --color-light-cream: #F5E6D3;
-  --color-white-cream: #FFF8F0;
+  /* Brand */
+  --color-brand: #7f1d1d; /* Red Bean crimson — primary actions, links, active state */
+  --color-brand-deep: #450a0a; /* Deep Crimson — headings, hover/gradient end, brand-as-alert */
+  --color-coffee: #6f4e37; /* Warm coffee brown — secondary brand accents */
+  --color-cream: #f5e6d3; /* Smooth cream — warm secondary surfaces */
+  --color-cream-white: #fff8f0; /* Crisp white-cream — light surfaces on brand chrome */
+
+  /* Neutral surfaces & text (light chrome) */
+  --color-surface: #fafaf9; /* page background */
+  --color-surface-muted: #f5f5f4; /* cards-on-cards, toggle tracks */
+  --color-border: #e7e5e4; /* default hairline border */
+  --color-border-strong: #d6d3d1; /* hover/emphasized border */
+  --color-ink: #292524; /* headings, primary text */
+  --color-ink-soft: #44403c; /* labels, sub-headings */
+  --color-ink-muted: #78716c; /* secondary/help text */
+  --color-ink-faint: #a8a29e; /* placeholder/meta text */
+
+  /* Dark chrome (admin sidebar) */
+  --color-surface-dark: #1c1917;
+  --color-border-dark: #292524;
+  --color-ink-on-dark: #f5f5f4;
+  --color-ink-on-dark-muted: #a8a29e;
+
+  /* Status */
+  --color-success: #15803d; /* approved, success banners */
+  --color-warning: #78350f; /* deadline notices, holiday mode */
+  --color-danger: #881337; /* under-scheduled / compliance violations */
+  --color-caution: #7c2d12; /* over-scheduled */
 }
 
 * {

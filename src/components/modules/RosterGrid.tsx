@@ -74,14 +74,14 @@ export default function RosterGrid({
     let constraintBadge = null;
     if (!meetsMinimum) {
       constraintBadge = (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-900">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400 duration-2000" />
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-danger/20 bg-danger/5 px-2.5 py-1 text-xs font-medium text-danger">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-danger/60 duration-2000" />
           Under-scheduled ({metrics.shiftCount} shifts, {metrics.totalHours}h)
         </span>
       );
     } else if (!withinMaximum) {
       constraintBadge = (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-900">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-caution/20 bg-caution/5 px-2.5 py-1 text-xs font-medium text-caution">
           Over-scheduled ({metrics.totalHours}h)
         </span>
       );
@@ -90,10 +90,10 @@ export default function RosterGrid({
     return (
       <div
         key={avail.id}
-        className="overflow-hidden rounded-xl border border-stone-200/60 bg-white transition-colors duration-150 hover:bg-orange-50/40"
+        className="overflow-hidden rounded-xl border border-border/60 bg-white transition-colors duration-150 hover:bg-orange-50/40"
       >
         {/* Employee Header */}
-        <div className="flex items-start justify-between gap-3 border-b border-stone-200/60 p-4">
+        <div className="flex items-start justify-between gap-3 border-b border-border/60 p-4">
           <div className="flex flex-1 items-start gap-3">
             <AvatarDisplay
               email={avail.profile?.email || 'Unknown Employee'}
@@ -101,10 +101,10 @@ export default function RosterGrid({
               size="md"
             />
             <div>
-              <h3 className="font-semibold text-stone-800">
+              <h3 className="font-semibold text-ink">
                 {avail.profile?.email || 'Unknown Employee'}
               </h3>
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-ink-faint">
                 ID: {avail.profile_id.substring(0, 8)}...
               </p>
             </div>
@@ -114,8 +114,8 @@ export default function RosterGrid({
             <span
               className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
                 avail.status === 'approved'
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-amber-100 text-amber-900'
+                  ? 'bg-success/15 text-success'
+                  : 'bg-warning/15 text-warning'
               }`}
             >
               {avail.status === 'approved' ? '✓ Approved' : 'Pending'}
@@ -125,13 +125,14 @@ export default function RosterGrid({
 
         {/* Shift Grid */}
         <div className="overflow-x-auto p-4">
-          <div className="inline-grid gap-px overflow-hidden rounded-lg border border-stone-200/60 bg-stone-200/60">
+          <div className="inline-grid gap-px overflow-hidden rounded-lg border border-border/60 bg-border/60">
             {/* Day headers */}
             <div className="flex gap-px">
+              <div className="w-20 bg-surface-muted/80 p-2" />
               {DAYS_OF_WEEK.map((day) => (
                 <div
                   key={`header-${day}`}
-                  className="w-16 bg-stone-100/80 p-2 text-center text-xs font-semibold uppercase tracking-wider text-stone-700"
+                  className="w-16 bg-surface-muted/80 p-2 text-center text-xs font-semibold uppercase tracking-wider text-ink-soft"
                 >
                   {DAY_LABELS[day]}
                 </div>
@@ -141,38 +142,43 @@ export default function RosterGrid({
             {/* Shift rows */}
             {SHIFT_TYPES.map((shift) => (
               <div key={`row-${shift}`} className="flex gap-px">
-                {DAYS_OF_WEEK.map((day) => (
-                  <div
-                    key={`cell-${day}-${shift}`}
-                    className="flex h-12 w-16 items-center justify-center bg-white text-xs"
-                    title={`${DAY_LABELS[day]} ${SHIFT_LABELS[shift]}`}
-                  >
+                <div className="flex w-20 flex-col justify-center bg-surface-muted/80 px-2 py-1">
+                  <span className="text-xs font-semibold capitalize text-ink-soft">{shift}</span>
+                  <span className="text-[10px] text-ink-faint">{SHIFT_LABELS[shift]}</span>
+                </div>
+                {DAYS_OF_WEEK.map((day) => {
+                  const isOn = (avail.shift_data as any)[day]?.[shift];
+                  return (
                     <div
-                      className={`flex h-full w-full items-center justify-center font-semibold transition-all ${
-                        (avail.shift_data as any)[day]?.[shift]
-                          ? 'bg-red-950/5 text-red-900'
-                          : 'text-stone-300'
-                      }`}
+                      key={`cell-${day}-${shift}`}
+                      className="flex h-12 w-16 items-center justify-center bg-white text-xs"
+                      title={`${DAY_LABELS[day]} ${SHIFT_LABELS[shift]}`}
                     >
-                      {(avail.shift_data as any)[day]?.[shift] ? '✓' : '–'}
+                      <div
+                        className={`flex h-full w-full items-center justify-center font-semibold transition-all ${
+                          isOn ? 'bg-brand text-cream-white' : 'text-border-strong'
+                        }`}
+                      >
+                        {isOn ? '✓' : '–'}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ))}
           </div>
         </div>
 
         {/* Metrics & Action */}
-        <div className="flex items-center justify-between border-t border-stone-200/60 p-4">
-          <div className="text-sm text-stone-500">
-            <span className="font-semibold text-stone-700">{metrics.shiftCount} shifts</span>,{' '}
-            <span className="font-semibold text-stone-700">{metrics.totalHours}h total</span>
+        <div className="flex items-center justify-between border-t border-border/60 p-4">
+          <div className="text-sm text-ink-muted">
+            <span className="font-semibold text-ink-soft">{metrics.shiftCount} shifts</span>,{' '}
+            <span className="font-semibold text-ink-soft">{metrics.totalHours}h total</span>
           </div>
           {avail.status === 'pending' && onApprovalChange && (
             <button
               onClick={() => onApprovalChange(avail.id, 'approved')}
-              className="rounded-lg bg-linear-to-r from-red-950 to-red-900 px-4 py-2 text-sm font-medium text-stone-100 shadow-md shadow-red-950/10 transition-all duration-200 hover:from-red-900 active:scale-[0.98]"
+              className="rounded-lg bg-linear-to-r from-brand-deep to-brand px-4 py-2 text-sm font-medium text-cream-white shadow-md shadow-brand-deep/10 transition-all duration-200 hover:from-brand active:scale-[0.98]"
             >
               Approve
             </button>
@@ -180,7 +186,7 @@ export default function RosterGrid({
           {avail.status === 'approved' && onApprovalChange && (
             <button
               onClick={() => onApprovalChange(avail.id, 'pending')}
-              className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-600 transition-all duration-200 hover:bg-stone-50 active:scale-[0.98]"
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink-soft transition-all duration-200 hover:bg-surface active:scale-[0.98]"
             >
               Revert
             </button>
@@ -193,19 +199,19 @@ export default function RosterGrid({
   // Calculate shift staffing summary
   const renderStaffingSummary = () => {
     return (
-      <div className="overflow-hidden rounded-xl border border-stone-200/60 bg-white">
-        <div className="border-b border-stone-200/60 bg-stone-100/80 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-700">
+      <div className="overflow-hidden rounded-xl border border-border/60 bg-white">
+        <div className="border-b border-border/60 bg-surface-muted/80 p-4">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-soft">
             Shift Staffing Summary
           </h3>
         </div>
-        <div className="divide-y divide-stone-200/60">
+        <div className="divide-y divide-border/60">
           {DAYS_OF_WEEK.map((day) => (
             <div
               key={`summary-${day}`}
               className="flex items-center gap-4 p-4 transition-colors duration-150 hover:bg-orange-50/40"
             >
-              <div className="w-20 text-sm font-semibold text-stone-700">{DAY_LABELS[day]}</div>
+              <div className="w-20 text-sm font-semibold text-ink-soft">{DAY_LABELS[day]}</div>
               <div className="flex flex-1 gap-3">
                 {SHIFT_TYPES.map((shift) => {
                   const required = (capacityRules[day] as any)?.[shift] || 0;
@@ -215,15 +221,15 @@ export default function RosterGrid({
                   return shortfall > 0 ? (
                     <span
                       key={`summary-${day}-${shift}`}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-900"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-danger/20 bg-danger/5 px-2.5 py-1 text-xs font-medium text-danger"
                     >
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400 duration-2000" />
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-danger/60 duration-2000" />
                       {SHIFT_LABELS[shift]} {actual}/{required}
                     </span>
                   ) : (
                     <span
                       key={`summary-${day}-${shift}`}
-                      className="inline-flex items-center rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-xs font-medium text-stone-600"
+                      className="inline-flex items-center rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-ink-soft"
                     >
                       {SHIFT_LABELS[shift]} {actual}/{required}
                     </span>
@@ -245,7 +251,7 @@ export default function RosterGrid({
       {/* Pending Approvals Section */}
       {pendingAvailabilities.length > 0 && (
         <div>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-stone-700">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-ink-soft">
             Pending Approvals ({pendingAvailabilities.length})
           </h2>
           <div className="space-y-3">
@@ -257,7 +263,7 @@ export default function RosterGrid({
       {/* Approved Section */}
       {approvedAvailabilities.length > 0 && (
         <div>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-stone-700">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-ink-soft">
             Approved ({approvedAvailabilities.length})
           </h2>
           <div className="space-y-3">
@@ -267,8 +273,8 @@ export default function RosterGrid({
       )}
 
       {pendingAvailabilities.length === 0 && approvedAvailabilities.length === 0 && (
-        <div className="rounded-xl border border-stone-200/60 bg-white py-12 text-center">
-          <p className="text-stone-500">No availabilities submitted for this week</p>
+        <div className="rounded-xl border border-border/60 bg-white py-12 text-center">
+          <p className="text-ink-muted">No availabilities submitted for this week</p>
         </div>
       )}
     </div>
