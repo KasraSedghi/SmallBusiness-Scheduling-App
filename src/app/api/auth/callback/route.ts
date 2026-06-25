@@ -47,11 +47,11 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Check if profile exists for this email (account linking)
+  // Check if profile exists for this user (account linking)
   const { data: existingProfile, error: lookupError } = await supabase
     .from('profiles')
     .select('id, role')
-    .eq('email', userEmail)
+    .eq('id', user.id)
     .single();
 
   let userRole: 'employee' | 'admin' = 'employee';

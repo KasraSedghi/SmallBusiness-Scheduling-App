@@ -8,7 +8,7 @@ const PUBLIC_ROUTES = ['/login', '/'];
 // Role-based route protection
 const PROTECTED_ROUTES: Record<string, string[]> = {
   '/availability': ['employee', 'admin'],
-  '/admin/dashboard': ['admin'],
+  '/admin': ['admin'],
 };
 
 export async function middleware(request: NextRequest) {
