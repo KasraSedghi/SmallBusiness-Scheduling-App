@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import { getCurrentUser } from '@/utils/supabase/auth';
+import { requireAdmin } from '@/utils/supabase/admin-guard';
 import { sendBroadcastEmails } from '@/utils/email/resend';
 
 export interface PublishResult {
@@ -71,8 +71,8 @@ async function triggerBroadcastEmails(weekStarting: string, approvedCount: numbe
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user.data || user.data.role !== 'admin') {
+    const { authorized } = await requireAdmin();
+    if (!authorized) {
       return Response.json({ error: 'Unauthorized' }, { status: 403 });
     }
 

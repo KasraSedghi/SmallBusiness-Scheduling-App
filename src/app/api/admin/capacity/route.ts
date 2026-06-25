@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import { getCurrentUser } from '@/utils/supabase/auth';
+import { requireAdmin } from '@/utils/supabase/admin-guard';
 import { getWeekStartingDate } from '@/utils/shift-helpers';
 
 const DAYS = [
@@ -60,8 +60,8 @@ const DEFAULT_CAPACITIES = createDefaultCapacities();
 
 export async function GET(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user.data || user.data.role !== 'admin') {
+    const { authorized } = await requireAdmin();
+    if (!authorized) {
       return Response.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -143,8 +143,8 @@ function validateCapacity(
  */
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user.data || user.data.role !== 'admin') {
+    const { authorized } = await requireAdmin();
+    if (!authorized) {
       return Response.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -193,8 +193,8 @@ export async function POST(request: Request) {
  */
 export async function PUT(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user.data || user.data.role !== 'admin') {
+    const { authorized } = await requireAdmin();
+    if (!authorized) {
       return Response.json({ error: 'Unauthorized' }, { status: 403 });
     }
 

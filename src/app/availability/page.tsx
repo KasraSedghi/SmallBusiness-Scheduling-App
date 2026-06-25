@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShiftSelector } from '@/components/modules/ShiftSelector';
 import AvatarUploader from '@/components/modules/AvatarUploader';
-import { getCurrentUser } from '@/utils/supabase/auth';
+import { getCurrentUser, signOut } from '@/utils/supabase/auth';
 import { createClient } from '@/utils/supabase/client';
 import {
   calculateTotalHours,
@@ -234,10 +234,13 @@ export default function AvailabilityPage() {
             </div>
           </div>
           <button
-            onClick={() => router.push('/')}
+            onClick={async () => {
+              await signOut();
+              router.push('/');
+            }}
             className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700"
           >
-            Back
+            Sign Out
           </button>
         </div>
       </header>
