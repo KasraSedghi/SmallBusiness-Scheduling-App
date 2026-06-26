@@ -79,11 +79,11 @@ export function ShiftSelector({
                     disabled={isLocked}
                     onClick={() => !isLocked && onShiftChange(day.key, shiftType, !isSelected)}
                     className={`min-h-11 select-none rounded-xl p-4 text-left transition-all duration-200 ${
-                      isLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer active:scale-95 active:duration-150'
+                      isLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer active:scale-[0.98] active:duration-150'
                     } ${
                       isSelected
                         ? `font-medium ${SHIFT_SELECTED_CLASSES[shiftType]}`
-                        : 'border border-border bg-white/90 text-ink-soft hover:border-border-strong'
+                        : 'border border-border bg-surface-muted text-ink-soft hover:border-border-strong hover:bg-border'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">

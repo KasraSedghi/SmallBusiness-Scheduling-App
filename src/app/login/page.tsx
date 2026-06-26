@@ -335,7 +335,7 @@ export default function LoginPage() {
               onClick={() => switchMode('signin')}
               className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all duration-200 ${
                 mode === 'signin'
-                  ? 'bg-white text-brand-deep shadow-sm'
+                  ? 'bg-border text-ink shadow-sm'
                   : 'text-ink-muted hover:text-ink-soft'
               }`}
             >
@@ -346,7 +346,7 @@ export default function LoginPage() {
               onClick={() => switchMode('signup')}
               className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all duration-200 ${
                 mode === 'signup'
-                  ? 'bg-white text-brand-deep shadow-sm'
+                  ? 'bg-border text-ink shadow-sm'
                   : 'text-ink-muted hover:text-ink-soft'
               }`}
             >
@@ -383,7 +383,7 @@ export default function LoginPage() {
                   setEmail(e.target.value);
                   setError('');
                 }}
-                className="w-full rounded-xl border border-border bg-white/80 px-4 py-3 text-sm text-ink placeholder-ink-faint shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-1 focus:ring-brand/40"
+                className="w-full rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm text-ink placeholder-ink-faint shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-1 focus:ring-brand/40"
                 disabled={loading}
               />
             </div>
@@ -401,7 +401,7 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => handlePasswordChange(e.target.value)}
-                className="w-full rounded-xl border border-border bg-white/80 px-4 py-3 text-sm text-ink placeholder-ink-faint shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-1 focus:ring-brand/40"
+                className="w-full rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm text-ink placeholder-ink-faint shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-1 focus:ring-brand/40"
                 disabled={loading}
               />
               {passwordError && (
@@ -426,7 +426,7 @@ export default function LoginPage() {
                     setConfirmPassword(e.target.value);
                     setError('');
                   }}
-                  className="w-full rounded-xl border border-border bg-white/80 px-4 py-3 text-sm text-ink placeholder-ink-faint shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-1 focus:ring-brand/40"
+                  className="w-full rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm text-ink placeholder-ink-faint shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-1 focus:ring-brand/40"
                   disabled={loading}
                 />
               </div>
@@ -449,7 +449,7 @@ export default function LoginPage() {
                     setAccessCode(e.target.value);
                     setError('');
                   }}
-                  className="w-full rounded-xl border border-border bg-white/80 px-4 py-3 text-sm text-ink placeholder-ink-faint shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-1 focus:ring-brand/40"
+                  className="w-full rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm text-ink placeholder-ink-faint shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-1 focus:ring-brand/40"
                   disabled={loading}
                 />
                 <p className="mt-1.5 text-xs text-ink-faint">
@@ -488,7 +488,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-ink-soft transition-all duration-200 hover:bg-surface/80 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-ink-soft transition-all duration-200 hover:bg-border active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path

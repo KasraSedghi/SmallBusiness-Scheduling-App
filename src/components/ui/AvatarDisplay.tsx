@@ -32,14 +32,14 @@ export default function AvatarDisplay({
       <img
         src={avatarUrl}
         alt={email}
-        className={`rounded-full object-cover border-2 border-red-bean ${sizeClass} ${className}`}
+        className={`rounded-full object-cover border-2 border-brand ${sizeClass} ${className}`}
       />
     );
   }
 
   return (
     <div
-      className={`rounded-full bg-red-bean text-white flex items-center justify-center font-bold border-2 border-red-bean ${sizeClass} ${className}`}
+      className={`rounded-full bg-brand text-cream-white flex items-center justify-center font-bold border-2 border-brand ${sizeClass} ${className}`}
     >
       {initials}
     </div>

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import RosterGrid from '@/components/modules/RosterGrid';
 import { getUserProfile, signOut } from '@/utils/supabase/auth';
 import { getWeekStartingDate } from '@/utils/shift-helpers';
-import { Availability, TimeOffRequest, CapacityRules } from '@/types';
+import { Availability, CapacityRules } from '@/types';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -18,7 +18,6 @@ export default function DashboardPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [availabilities, setAvailabilities] = useState<(Availability & { profile?: any })[]>([]);
-  const [timeOffRequests, setTimeOffRequests] = useState<TimeOffRequest[]>([]);
   const [capacityRules, setCapacityRules] = useState<CapacityRules['capacity']>(
     {} as CapacityRules['capacity']
   );
@@ -51,7 +50,6 @@ export default function DashboardPage() {
       }
 
       setAvailabilities(availJson.data.availabilities || []);
-      setTimeOffRequests(availJson.data.time_off_requests || []);
       setCapacityRules(
         (capacityJson.data.rules || capacityJson.data)?.capacity || ({} as CapacityRules['capacity'])
       );
@@ -66,31 +64,6 @@ export default function DashboardPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  const handleApprovalChange = async (availabilityId: string, newStatus: string) => {
-    setError(null);
-    try {
-      const res = await fetch('/api/admin/availability', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: availabilityId, status: newStatus }),
-      });
-      const json = await res.json();
-
-      if (!res.ok || json.error) {
-        throw new Error(json.error || 'Failed to update availability');
-      }
-
-      setAvailabilities((prev) =>
-        prev.map((a) => (a.id === availabilityId ? { ...a, status: newStatus as any } : a))
-      );
-      setSuccessMessage('Availability approved successfully');
-      setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (err) {
-      console.error('Failed to update availability:', err);
-      setError('Failed to update availability. Please try again.');
-    }
-  };
 
   const handlePublish = async () => {
     setError(null);
@@ -153,6 +126,20 @@ export default function DashboardPage() {
               Roster Dashboard
             </div>
             <Link
+              href="/admin/approvals"
+              className="flex items-center gap-4 rounded-xl px-4 py-3.5 text-base font-semibold text-ink-on-dark-muted transition-colors hover:bg-border-dark/60 hover:text-ink-on-dark"
+            >
+              <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Approvals Queue
+              {pendingCount > 0 && (
+                <span className="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-brand px-1.5 text-xs font-bold text-cream-white">
+                  {pendingCount}
+                </span>
+              )}
+            </Link>
+            <Link
               href="/admin/capacity"
               className="flex items-center gap-4 rounded-xl px-4 py-3.5 text-base font-semibold text-ink-on-dark-muted transition-colors hover:bg-border-dark/60 hover:text-ink-on-dark"
             >
@@ -210,13 +197,6 @@ export default function DashboardPage() {
 
       {/* Main tracking dashboard */}
       <main className="flex-1 overflow-x-auto bg-surface/50 p-8">
-        <h1 className="mb-1 inline-block bg-linear-to-r from-brand via-shift-evening to-shift-morning bg-clip-text text-3xl font-bold text-transparent">
-          Roster Matrix
-        </h1>
-        <p className="mb-6 text-sm text-ink-muted">
-          Review submissions, approve coverage, and publish the final week's roster.
-        </p>
-
         {/* Stats overview */}
         <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[
@@ -284,9 +264,7 @@ export default function DashboardPage() {
         <RosterGrid
           availabilities={availabilities}
           capacityRules={capacityRules}
-          timeOffRequests={timeOffRequests}
           weekStarting={weekStarting}
-          onApprovalChange={handleApprovalChange}
         />
       </main>
     </div>

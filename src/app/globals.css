@@ -8,50 +8,54 @@
  * Components should reach for these names instead of raw Tailwind palette
  * classes (bg-stone-50, text-red-900, etc.) so the palette only has one place
  * to change and a shared vocabulary across pages.
+ *
+ * Dark Modernist theme: the whole app is a dark-mode SaaS surface (obsidian
+ * body, charcoal panels, zinc borders) with the Red Bean crimson + shift
+ * accents kept as the one vibrant accent family, brightened so they read on
+ * black instead of on cream.
  */
 @theme {
   /* Brand */
-  --color-brand: #7f1d1d; /* Red Bean crimson — primary actions, links, active state */
-  --color-brand-deep: #450a0a; /* Deep Crimson — headings, hover/gradient end, brand-as-alert */
-  --color-coffee: #6f4e37; /* Warm coffee brown — secondary brand accents */
-  --color-cream: #f5e6d3; /* Smooth cream — warm secondary surfaces */
-  --color-cream-white: #fff8f0; /* Crisp white-cream — light surfaces on brand chrome */
+  --color-brand: #e11d48; /* Red Bean crimson, brightened for dark chrome — primary actions, links, active state */
+  --color-brand-deep: #9f1239; /* Deep crimson — gradient end, hover, brand-as-alert */
+  --color-coffee: #b08968; /* Warm coffee brown, lightened — secondary brand accents */
+  --color-cream: #f5e6d3; /* Smooth cream — reserved for text/labels on saturated brand surfaces */
+  --color-cream-white: #fff8f0; /* Crisp white-cream — text on brand-colored buttons/tiles */
 
-  /* Neutral surfaces & text (light chrome) */
-  --color-surface: #fafaf9; /* page background */
-  --color-surface-muted: #f5f5f4; /* cards-on-cards, toggle tracks */
-  --color-border: #e7e5e4; /* default hairline border */
-  --color-border-strong: #d6d3d1; /* hover/emphasized border */
-  --color-ink: #292524; /* headings, primary text */
-  --color-ink-soft: #44403c; /* labels, sub-headings */
-  --color-ink-muted: #78716c; /* secondary/help text */
-  --color-ink-faint: #a8a29e; /* placeholder/meta text */
+  /* Neutral surfaces & text (dark chrome — the whole app) */
+  --color-surface: #09090b; /* page background — obsidian */
+  --color-surface-muted: #18181b; /* cards, panels, toggle tracks — deep charcoal */
+  --color-border: #27272a; /* default hairline border / hover fill */
+  --color-border-strong: #3f3f46; /* hover/emphasized border, unselected glyph color */
+  --color-ink: #fafafa; /* headings, primary text */
+  --color-ink-soft: #d4d4d8; /* labels, sub-headings, secondary buttons */
+  --color-ink-muted: #a1a1aa; /* help text, metadata */
+  --color-ink-faint: #71717a; /* placeholder text, least-important meta */
 
-  /* Dark chrome (admin sidebar) */
-  --color-surface-dark: #1c1917;
-  --color-border-dark: #292524;
-  --color-ink-on-dark: #f5f5f4;
-  --color-ink-on-dark-muted: #a8a29e;
+  /* Darkest chrome (admin sidebar — one shade below the main panels) */
+  --color-surface-dark: #000000;
+  --color-border-dark: #18181b;
+  --color-ink-on-dark: #fafafa;
+  --color-ink-on-dark-muted: #a1a1aa;
 
-  /* Status */
-  --color-success: #15803d; /* approved, success banners */
-  --color-warning: #78350f; /* deadline notices, holiday mode */
-  --color-danger: #881337; /* under-scheduled / compliance violations */
-  --color-caution: #7c2d12; /* over-scheduled */
+  /* Status (brightened for visibility on dark surfaces) */
+  --color-success: #22c55e; /* approved badges, success banners */
+  --color-warning: #f59e0b; /* deadline notices, pending badges, holiday-mode banners */
+  --color-danger: #f43f5e; /* under-scheduled / compliance violations */
+  --color-caution: #fb923c; /* over-scheduled */
 
   /*
    * Schedule shift-type accents — colour-code the weekly roster by shift block
-   * (morning/afternoon/evening) the way the Employee_scheduling reference does.
-   * Warm, café-leaning hues anchored by the brand crimson on the evening close.
+   * (morning/afternoon/evening), brightened so they pop against obsidian/charcoal.
    */
-  --color-shift-morning: #c2410c; /* honey orange — opening shift */
-  --color-shift-afternoon: #0f766e; /* teal — midday shift */
-  --color-shift-evening: #9f1239; /* rose-crimson — closing shift */
+  --color-shift-morning: #f97316; /* vivid orange — opening shift */
+  --color-shift-afternoon: #14b8a6; /* vivid teal — midday shift */
+  --color-shift-evening: #fb7185; /* vivid rose — closing shift */
 
-  /* Soft tints of the shift accents for cell fills / chips */
-  --color-shift-morning-soft: #ffedd5;
-  --color-shift-afternoon-soft: #ccfbf1;
-  --color-shift-evening-soft: #ffe4e6;
+  /* Dark tinted fills of the shift accents for cell/chip backgrounds */
+  --color-shift-morning-soft: #2a1606;
+  --color-shift-afternoon-soft: #052e2b;
+  --color-shift-evening-soft: #2c0a14;
 }
 
 * {
@@ -64,8 +68,42 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  background-color: var(--color-surface);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 9999px;
+}
+
+/*
+ * Shared dark-surface card treatment: deep charcoal panel on a zinc
+ * micro-border, with a subtle crimson-tinted glow on hover so every
+ * card/panel/calendar-cell across the app gets the same Monday.com/Linear-
+ * style "lift" without repeating the same six utility classes everywhere.
+ */
+.panel {
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+.panel:hover {
+  border-color: var(--color-border-strong);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 12px 32px -12px rgba(0, 0, 0, 0.7),
+    0 0 28px -6px rgba(225, 29, 72, 0.18);
 }
 
 code {

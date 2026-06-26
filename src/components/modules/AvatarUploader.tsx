@@ -8,6 +8,7 @@ interface AvatarUploaderProps {
   profileId: string;
   currentAvatarUrl?: string | null;
   onUploadSuccess?: (url: string) => void;
+  compact?: boolean;
 }
 
 function getInitials(email: string): string {
@@ -85,6 +86,7 @@ export default function AvatarUploader({
   profileId,
   currentAvatarUrl,
   onUploadSuccess,
+  compact = false,
 }: AvatarUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -175,17 +177,23 @@ export default function AvatarUploader({
     }
   };
 
+  const avatarSize = compact ? 'w-14 h-14' : 'w-20 h-20';
+
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className={`flex flex-col items-center gap-4 ${compact ? 'gap-3' : ''}`}>
       <div className="relative">
         {preview ? (
           <img
             src={preview}
             alt={email}
-            className="w-20 h-20 rounded-full object-cover border-2 border-red-bean"
+            className={`${avatarSize} rounded-full object-cover border-2 border-brand`}
           />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-red-bean text-white flex items-center justify-center text-xl font-bold border-2 border-red-bean">
+          <div
+            className={`${avatarSize} rounded-full bg-brand text-cream-white flex items-center justify-center font-bold border-2 border-brand ${
+              compact ? 'text-sm' : 'text-xl'
+            }`}
+          >
             {initials}
           </div>
         )}
@@ -193,15 +201,10 @@ export default function AvatarUploader({
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="absolute bottom-0 right-0 bg-coffee-brown hover:bg-red-bean disabled:opacity-50 text-white rounded-full p-2 transition-colors"
+          className="absolute bottom-0 right-0 rounded-full bg-coffee p-2 text-cream-white transition-colors hover:bg-brand disabled:opacity-50 active:scale-[0.92]"
           title="Upload new picture"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -221,22 +224,16 @@ export default function AvatarUploader({
         className="hidden"
       />
 
-      {uploading && (
-        <p className="text-sm text-coffee-brown">Uploading...</p>
-      )}
+      {uploading && <p className="text-sm text-ink-muted">Uploading...</p>}
 
-      {error && (
-        <p className="text-sm text-red-600 text-center">{error}</p>
-      )}
+      {error && <p className="text-sm text-danger text-center">{error}</p>}
 
-      {success && (
-        <p className="text-sm text-green-600 text-center">{success}</p>
-      )}
+      {success && <p className="text-sm text-success text-center">{success}</p>}
 
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}
-        className="text-sm text-red-bean hover:underline disabled:opacity-50"
+        className="text-sm text-brand hover:underline disabled:opacity-50"
       >
         {preview ? 'Change Picture' : 'Upload Picture'}
       </button>

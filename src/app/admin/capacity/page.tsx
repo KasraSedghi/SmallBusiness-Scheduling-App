@@ -228,7 +228,7 @@ export default function AdminCapacityPage() {
         )}
 
         {/* Holiday Override Toggle */}
-        <div className="mb-8 bg-white rounded-lg p-6 border border-border">
+        <div className="panel mb-8 rounded-lg p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-brand mb-1">Holiday Override</h2>
@@ -245,7 +245,7 @@ export default function AdminCapacityPage() {
               }`}
             >
               <span
-                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                className={`inline-block h-6 w-6 transform rounded-full bg-cream-white transition-transform ${
                   isHoliday ? 'translate-x-7' : 'translate-x-1'
                 }`}
               />
@@ -256,7 +256,7 @@ export default function AdminCapacityPage() {
         {/* Capacity Settings Grid */}
         <div className="grid grid-cols-1 gap-6 mb-8">
           {DAYS_OF_WEEK.map((day) => (
-            <div key={day} className="bg-white rounded-lg p-6 border border-border">
+            <div key={day} className="panel rounded-lg p-6">
               <h3 className="text-lg font-semibold text-brand mb-4">{DAY_LABELS[day]}</h3>
 
               <div className="grid grid-cols-3 gap-4">
@@ -276,8 +276,8 @@ export default function AdminCapacityPage() {
                       disabled={isHoliday}
                       className={`w-full px-3 py-3 border border-border rounded-lg text-center font-semibold text-lg transition-colors ${
                         isHoliday
-                          ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                          : 'bg-white text-brand focus:outline-none focus:border-brand'
+                          ? 'bg-surface-muted text-ink-faint cursor-not-allowed'
+                          : 'bg-surface-muted text-brand focus:outline-none focus:border-brand'
                       }`}
                     />
                   </div>
@@ -285,8 +285,8 @@ export default function AdminCapacityPage() {
               </div>
 
               {isHoliday && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-xs text-blue-700">
+                <div className="mt-4 p-3 bg-shift-afternoon-soft border border-shift-afternoon/30 rounded-lg">
+                  <p className="text-xs text-shift-afternoon">
                     Holiday override active. Saved custom values will be restored when disabled.
                   </p>
                 </div>

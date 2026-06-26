@@ -108,3 +108,35 @@ export async function PUT(request: Request) {
     return Response.json({ error: 'Failed to update availability' }, { status: 500 });
   }
 }
+
+/**
+ * DELETE /api/admin/availability
+ * Disapprove (reject) a submission by removing the row.
+ * Body: { id: string }
+ */
+export async function DELETE(request: Request) {
+  try {
+    const { authorized } = await requireAdmin();
+    if (!authorized) {
+      return Response.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body.id !== 'string') {
+      return Response.json({ error: 'Missing required field: id' }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+
+    const { error } = await supabase.from('availabilities').delete().eq('id', body.id);
+
+    if (error) {
+      throw error;
+    }
+
+    return Response.json({ data: { id: body.id } }, { status: 200 });
+  } catch (err) {
+    console.error('Failed to delete availability:', err);
+    return Response.json({ error: 'Failed to delete availability' }, { status: 500 });
+  }
+}

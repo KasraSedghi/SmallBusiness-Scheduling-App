@@ -4,7 +4,7 @@ export default function AvailabilityLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-white-cream">
+    <div className="min-h-screen bg-surface">
       {children}
     </div>
   );

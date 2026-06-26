@@ -14,7 +14,7 @@ A highly intuitive, mobile-friendly internal scheduling and availability platfor
 - Shift Structure: Fixed blocks of time.
 - Schedule Submission Deadline: Locked automatically every Sunday morning at 10:00 AM.
 - Content Approval: Employee inputs are set to "Pending" and must be approved by an Admin.
-- Brand Theme Colors: Deep Crimson/Red Bean, Warm Coffee Browns, Smooth Creams, Crisp White.
+- Brand Theme Colors: Dark Modernist SaaS — Obsidian/Black base, Charcoal/Zinc surfaces, with brightened Red Bean Crimson and shift-block accents (orange/teal/rose) as the vibrant highlight family.
 
 ## Key commands
 - `npm run dev` — Start the Next.js development server

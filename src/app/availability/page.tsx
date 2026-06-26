@@ -28,6 +28,7 @@ export default function AvailabilityPage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
   const [hoursUntilDeadline, setHoursUntilDeadline] = useState(0);
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
 
   const weekStarting = getWeekStartingDate();
   const totalHours = calculateTotalHours(shiftData);
@@ -205,43 +206,67 @@ export default function AvailabilityPage() {
 
   return (
     <div className="min-h-screen bg-surface">
-      {/* Sticky header: employee profile section */}
-      <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur-md">
+      {/* Sticky header: week label on the left, profile avatar + Sign Out pinned top-right */}
+      <header className="sticky top-0 z-20 border-b border-border bg-surface/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-3 min-w-0">
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={userEmail || 'Profile'}
-                className="h-10 w-10 shrink-0 rounded-full border border-orange-200/60 object-cover shadow-inner"
-              />
-            ) : (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-orange-200/60 bg-orange-100 text-sm font-semibold text-brand-deep shadow-inner">
-                {initials}
-              </div>
-            )}
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-ink">
-                {userEmail || 'Employee'}
-              </p>
-              <p className="truncate text-xs text-ink-muted">
-                Week of{' '}
-                {new Date(weekStarting).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </p>
-            </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-ink">{userEmail || 'Employee'}</p>
+            <p className="truncate text-xs text-ink-muted">
+              Week of{' '}
+              {new Date(weekStarting).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              })}
+            </p>
           </div>
-          <button
-            onClick={async () => {
-              await signOut();
-              router.push('/');
-            }}
-            className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink-soft"
-          >
-            Sign Out
-          </button>
+
+          <div className="flex shrink-0 items-center gap-3">
+            {/* Avatar trigger, pinned to the extreme top-right corner */}
+            <div className="relative">
+              <button
+                onClick={() => setShowAvatarMenu((prev) => !prev)}
+                className="block rounded-full transition-transform duration-200 hover:scale-105 active:scale-[0.95]"
+                title="Profile picture"
+              >
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={userEmail || 'Profile'}
+                    className="h-10 w-10 shrink-0 rounded-full border-2 border-brand object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-brand bg-surface-muted text-sm font-semibold text-ink">
+                    {initials}
+                  </div>
+                )}
+              </button>
+
+              {showAvatarMenu && userId && userEmail && (
+                <div className="panel absolute right-0 top-full z-30 mt-3 w-64 animate-in fade-in slide-in-from-top-2 duration-200 p-4">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                    Profile Picture
+                  </p>
+                  <AvatarUploader
+                    profileId={userId}
+                    email={userEmail}
+                    currentAvatarUrl={avatarUrl}
+                    onUploadSuccess={(url) => setAvatarUrl(url)}
+                    compact
+                  />
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={async () => {
+                await signOut();
+                router.push('/');
+              }}
+              className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-all duration-200 hover:bg-border hover:text-ink-soft active:scale-[0.98]"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -296,18 +321,18 @@ export default function AvailabilityPage() {
 
         <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
           {/* Left: Requirements */}
-          <div className="rounded-2xl border border-border bg-white/90 p-6">
+          <div className="panel p-6">
             <h2 className="mb-5 text-xl font-bold text-ink">Weekly Requirements</h2>
 
             <div className="space-y-4">
               <div
                 className={`flex items-center gap-4 rounded-xl p-4 ${
-                  totalShifts >= 2 ? 'bg-success/10' : 'bg-surface-muted'
+                  totalShifts >= 2 ? 'bg-success/10' : 'bg-border/40'
                 }`}
               >
                 <div
                   className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${
-                    totalShifts >= 2 ? 'bg-success/15 text-success' : 'bg-white text-ink-faint'
+                    totalShifts >= 2 ? 'bg-success/15 text-success' : 'bg-surface-muted text-ink-faint'
                   }`}
                 >
                   <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,12 +351,12 @@ export default function AvailabilityPage() {
 
               <div
                 className={`flex items-center gap-4 rounded-xl p-4 ${
-                  totalHours >= 8 ? 'bg-success/10' : 'bg-surface-muted'
+                  totalHours >= 8 ? 'bg-success/10' : 'bg-border/40'
                 }`}
               >
                 <div
                   className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${
-                    totalHours >= 8 ? 'bg-success/15 text-success' : 'bg-white text-ink-faint'
+                    totalHours >= 8 ? 'bg-success/15 text-success' : 'bg-surface-muted text-ink-faint'
                   }`}
                 >
                   <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -392,7 +417,7 @@ export default function AvailabilityPage() {
           </div>
 
           {/* Right: Scheduling */}
-          <div className="rounded-2xl border border-border bg-white/90 p-6">
+          <div className="panel p-6">
             <h2 className="mb-5 text-xl font-bold text-ink">Pick Your Shifts</h2>
 
             <div className="mb-6">
@@ -416,19 +441,6 @@ export default function AvailabilityPage() {
             </button>
           </div>
         </div>
-
-        {/* Avatar settings */}
-        {userId && userEmail && (
-          <div className="mt-6 rounded-xl border border-border bg-white/90 p-4">
-            <h3 className="mb-3 text-sm font-semibold text-ink-soft">Profile Picture</h3>
-            <AvatarUploader
-              profileId={userId}
-              email={userEmail}
-              currentAvatarUrl={avatarUrl}
-              onUploadSuccess={(url) => setAvatarUrl(url)}
-            />
-          </div>
-        )}
       </div>
     </div>
   );
